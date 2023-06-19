@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@alien-worlds/api-core@^0.0.130":
-  version "0.0.130"
-  resolved "https://npm.pkg.github.com/download/@alien-worlds/api-core/0.0.130/bdc6c31030183c30d21ca0d12bff3a0a2b36d09d#bdc6c31030183c30d21ca0d12bff3a0a2b36d09d"
-  integrity sha512-LRNgEL0Qc95xexEoHGobgMBfLiM9/pAIviIuDfVhtc1bgwlaFBB68QhVMK+yFOCR27GXEJgBojjzxu3hox1xhA==
+"@alien-worlds/api-core@^0.0.133":
+  version "0.0.133"
+  resolved "https://npm.pkg.github.com/download/@alien-worlds/api-core/0.0.133/a6dcb9a75ea4a39ec6150243062ae80f97926b1b#a6dcb9a75ea4a39ec6150243062ae80f97926b1b"
+  integrity sha512-UMequXe5a8kIKbcYLkkxIaIK6XD2NSIAvg54MGkU8MaezvC54zMcNNQlfuPT2cTYMDWlb3D1LfsfIfxZPj9OkA==
   dependencies:
     inversify "^6.0.1"
     nanoid "^3.0.0"

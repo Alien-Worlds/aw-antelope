@@ -15,7 +15,7 @@ import {
  * It implements the RpcSource interface.
  * @class
  */
-export class EosRpcSource implements RpcSource {
+export class EosRpcSourceImpl implements RpcSource {
   private rpc: JsonRpc;
 
   /**

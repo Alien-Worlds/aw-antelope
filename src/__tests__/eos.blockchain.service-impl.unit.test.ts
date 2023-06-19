@@ -1,5 +1,5 @@
 import { Result } from '@alien-worlds/api-core';
-import { BlockchainServiceImpl } from '../blockchain-service-impl';
+import { EosBlockchainServiceImpl } from '../eos.blockchain.service-impl';
 
 describe('BlockchainServiceImpl', () => {
   let rpc;
@@ -12,7 +12,7 @@ describe('BlockchainServiceImpl', () => {
       getLastIrreversibleBlockNumber: jest.fn(),
     };
 
-    blockchainService = new BlockchainServiceImpl(rpc);
+    blockchainService = new EosBlockchainServiceImpl(rpc);
   });
 
   describe('getInfo', () => {

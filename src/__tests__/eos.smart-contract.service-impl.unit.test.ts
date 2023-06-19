@@ -1,4 +1,5 @@
-import { SmartContractServiceImpl } from '../smart-contract-service-impl';
+import { Result } from '@alien-worlds/api-core';
+import { EosSmartContractServiceImpl } from '../eos.smart-contract.service-impl';
 
 const rpc = {
   getTableRows: jest.fn(),
@@ -11,15 +12,15 @@ describe('Smart Contract Service Unit tests', () => {
   });
 
   it('"getStats" should return a result of the rpc.getContractStats method', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getContractStats.mockResolvedValue({ foo: 'foo' });
 
     const result = await service.getStats();
-    expect(result).toEqual({ foo: 'foo' });
+    expect(result).toEqual(Result.withContent({ first_block_num: -1, foo: 'foo' }));
   });
 
   it('"getMany" should return a failure when rows length is 0', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getTableRows.mockResolvedValue({ rows: [] });
 
     const result = await (service as any).getMany({} as any);
@@ -27,7 +28,7 @@ describe('Smart Contract Service Unit tests', () => {
   });
 
   it('"getMany" should return a failure when rpc call fail', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getTableRows.mockRejectedValue(new Error());
 
     const result = await (service as any).getMany({} as any);
@@ -36,7 +37,7 @@ describe('Smart Contract Service Unit tests', () => {
   });
 
   it('"getMany" should return an array of data', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getTableRows.mockResolvedValue({ rows: [{ foo: 'foo' }] });
 
     const result = await (service as any).getMany({} as any);
@@ -45,7 +46,7 @@ describe('Smart Contract Service Unit tests', () => {
   });
 
   it('"getOne" should return a failure when rows length is 0', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getTableRows.mockResolvedValue({ rows: [] });
 
     const result = await (service as any).getOne({} as any);
@@ -54,7 +55,7 @@ describe('Smart Contract Service Unit tests', () => {
   });
 
   it('"getOne" should return a failure when rpc call fail', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getTableRows.mockRejectedValue(new Error());
 
     const result = await (service as any).getOne({} as any);
@@ -63,7 +64,7 @@ describe('Smart Contract Service Unit tests', () => {
   });
 
   it('"getOne" should return an array of data', async () => {
-    const service = new SmartContractServiceImpl(rpc as any, 'foo');
+    const service = new EosSmartContractServiceImpl(rpc as any, 'localhost', 'foo');
     rpc.getTableRows.mockResolvedValue({ rows: [{ foo: 'foo' }] });
 
     const result = await (service as any).getOne({} as any);

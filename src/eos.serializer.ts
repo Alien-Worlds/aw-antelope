@@ -151,7 +151,7 @@ export class EosSerializer implements Serializer {
   public deserializeTransaction<T = unknown>(
     contract: string,
     data: Uint8Array,
-    abi: string | UnknownObject,
+    abi?: string | UnknownObject,
     ...args: unknown[]
   ): T {
     try {
@@ -163,31 +163,27 @@ export class EosSerializer implements Serializer {
         array: data,
       });
 
-      const version = sb.get(); // Read the version byte
-      const actionCount = sb.getVaruint32(); // Read the number of actions
+      const version = sb.get();
+      const actionCount = sb.getVaruint32();
 
       const deserializedActions = [];
       for (let i = 0; i < actionCount; i++) {
-        const account = sb.getName(); // Read the account name
-        const name = sb.getName(); // Read the action name
-        const authorizationCount = sb.getVaruint32(); // Read the number of authorizations
+        const account = sb.getName();
+        const name = sb.getName();
+        const authorizationCount = sb.getVaruint32();
 
         const authorization = [];
         for (let j = 0; j < authorizationCount; j++) {
-          const actor = sb.getName(); // Read the actor name
-          const permission = sb.getName(); // Read the permission name
+          const actor = sb.getName();
+          const permission = sb.getName();
           authorization.push({ actor, permission });
         }
 
-        const dataBytes = sb.getBytes(); // Read the data bytes
+        const dataBytes = sb.getBytes();
 
-        // Deserialize the action data based on the contract and action names
-        const deserializedData = this.deserializeActionData(
-          contract,
-          name,
-          dataBytes,
-          abi
-        );
+        const deserializedData = abi
+          ? this.deserializeActionData(contract, name, dataBytes, abi)
+          : dataBytes;
 
         deserializedActions.push({
           account,
@@ -197,7 +193,6 @@ export class EosSerializer implements Serializer {
         });
       }
 
-      // Return the deserialized transaction object
       return [version, { actions: deserializedActions }] as T;
     } catch (error) {
       console.error('Error deserializing transaction:', error);
@@ -214,22 +209,24 @@ export class EosSerializer implements Serializer {
    */
   public deserializeTable<Type = unknown>(
     data: Uint8Array,
-    abi: string | UnknownObject,
+    abi?: string | UnknownObject,
     ...args: unknown[]
-  ): ContractTable<Type> {
+  ): ContractTable<Type | Uint8Array> {
     const sb = new Serialize.SerialBuffer({
       textEncoder: new TextEncoder(),
       textDecoder: new TextDecoder(),
       array: data,
     });
-    sb.get(); // version
-    const code = sb.getName(); // code
-    const scope = sb.getName(); // scope
-    const table = sb.getName(); // table
-    const primaryKey = Buffer.from(sb.getUint8Array(8)).readBigInt64BE(); // primary_key
-    const payer = sb.getName(); // payer
-    const bytes = sb.getBytes(); // data bytes
-    const deserializedData = this.deserializeTableDelta<Type>(table, bytes, abi);
+    sb.get();
+    const code = sb.getName();
+    const scope = sb.getName();
+    const table = sb.getName();
+    const primaryKey = Buffer.from(sb.getUint8Array(8)).readBigInt64BE();
+    const payer = sb.getName();
+    const bytes = sb.getBytes();
+    const deserializedData = abi
+      ? this.deserializeTableDelta<Type>(table, bytes, abi)
+      : bytes;
 
     return {
       code,

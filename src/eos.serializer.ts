@@ -35,7 +35,7 @@ export class EosSerializer implements Serializer {
    * Deserializes a block.
    *
    * @param {RawBlock} data - The raw block data.
-   * @param {string | UnknownObject} abi - The hexadecimal representation of the ABI or raw object.
+   * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @param {...unknown[]} args - Additional arguments for deserialization if needed.
    * @returns {ReturnType} The deserialized block.
    */
@@ -70,6 +70,7 @@ export class EosSerializer implements Serializer {
     }
 
     return {
+      ...data,
       block,
       traces,
       deltas,
@@ -82,7 +83,7 @@ export class EosSerializer implements Serializer {
    * @param {string} contract - The contract associated with the action.
    * @param {string} action - The action name.
    * @param {Uint8Array} data - The raw data to be deserialized.
-   * @param {string | UnknownObject} abi - The hexadecimal representation of the abi or raw object.
+   * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @returns {Type} The deserialized action data.
    */
   public deserializeActionData<T = UnknownObject>(
@@ -139,10 +140,10 @@ export class EosSerializer implements Serializer {
    *
    * @param {string} table - The table name.
    * @param {Uint8Array} data - The raw data to be deserialized.
-   * @param {string | UnknownObject} abi - The hexadecimal representation of the abi or raw object.
+   * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @returns {Type} The deserialized table delta.
    */
-  public deserializeTableDelta<T = UnknownObject>(
+  public deserializeTableRowData<T = UnknownObject>(
     table: string,
     data: Uint8Array,
     abi: string | UnknownObject,
@@ -150,6 +151,7 @@ export class EosSerializer implements Serializer {
   ): T {
     try {
       let contractAbi: Abi;
+
       if (typeof abi === 'string') {
         contractAbi = this.getAbiFromHex(abi);
       } else {
@@ -198,7 +200,7 @@ export class EosSerializer implements Serializer {
    *
    * @param {string} contract - The contract associated with the transaction.
    * @param {Uint8Array} data - The raw data to be deserialized.
-   * @param {string | UnknownObject} abi - The hexadecimal representation of the abi or raw object.
+   * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @returns {Type} The deserialized transaction.
    */
   public deserializeTransaction<T = unknown>(
@@ -257,10 +259,10 @@ export class EosSerializer implements Serializer {
    * Deserializes the table.
    *
    * @param {Uint8Array} data - The raw data to be deserialized.
-   * @param {string | UnknownObject} abi - The hexadecimal representation of the abi or raw object.
+   * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @returns {ContractTable<Type>} The deserialized table data.
    */
-  public deserializeTable<Type = unknown>(
+  public deserializeTableRow<Type = unknown>(
     data: Uint8Array,
     abi?: string | UnknownObject,
     ...args: unknown[]
@@ -278,7 +280,7 @@ export class EosSerializer implements Serializer {
     const payer = sb.getName();
     const bytes = sb.getBytes();
     const deserializedData = abi
-      ? this.deserializeTableDelta<Type>(table, bytes, abi)
+      ? this.deserializeTableRowData<Type>(table, bytes, abi)
       : bytes;
 
     return {

@@ -4,8 +4,78 @@ import { Serialize } from 'eosjs';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { Anyvar, Authorization } from 'eosjs/dist/eosjs-serialize';
 import { hexToUint8Array } from 'eosjs/dist/eosjs-serialize';
+import { RawBlock } from './eos.serializer.types';
 
+/**
+ * Serializer implementation for EOS.
+ */
 export class EosSerializer implements Serializer {
+  /**
+   * Private method to deserialize ABI from hexadecimal representation.
+   *
+   * @private
+   * @param {string} hex - The hexadecimal representation of the ABI.
+   * @returns {Abi} The deserialized ABI.
+   */
+  private getAbiFromHex(hex: string): Abi {
+    const textEncoder = new TextEncoder();
+    const textDecoder = new TextDecoder();
+    const bytes = hexToUint8Array(hex);
+    const abiTypes = Serialize.getTypesFromAbi(Serialize.createAbiTypes());
+    const buffer = new Serialize.SerialBuffer({
+      textEncoder,
+      textDecoder,
+      array: bytes,
+    });
+    buffer.restartRead();
+    return abiTypes.get('abi_def').deserialize(buffer);
+  }
+
+  /**
+   * Deserializes a block.
+   *
+   * @param {RawBlock} data - The raw block data.
+   * @param {string | UnknownObject} abi - The hexadecimal representation of the ABI or raw object.
+   * @param {...unknown[]} args - Additional arguments for deserialization if needed.
+   * @returns {ReturnType} The deserialized block.
+   */
+  public deserializeBlock<ReturnType = UnknownObject>(
+    data: RawBlock,
+    abi?: string | UnknownObject,
+    ...args: unknown[]
+  ): ReturnType {
+    let contractAbi: Abi;
+
+    if (typeof abi === 'string') {
+      contractAbi = this.getAbiFromHex(abi);
+    } else {
+      contractAbi = abi as unknown as Abi;
+    }
+
+    const types = Serialize.getTypesFromAbi(Serialize.createInitialTypes(), contractAbi);
+    let block;
+    let traces;
+    let deltas;
+
+    if (data.block && data.block.length > 0) {
+      block = this.deserialize(data.block, 'signed_block', types);
+    }
+
+    if (data.traces && data.traces.length > 0) {
+      traces = this.deserialize(data.traces, 'transaction_trace[]', types);
+    }
+
+    if (data.deltas && data.deltas.length > 0) {
+      deltas = this.deserialize(data.deltas, 'table_delta[]', types);
+    }
+
+    return {
+      block,
+      traces,
+      deltas,
+    } as ReturnType;
+  }
+
   /**
    * Deserializes the action data for a specific account and action.
    *
@@ -24,20 +94,8 @@ export class EosSerializer implements Serializer {
   ): T {
     try {
       let contractAbi: Abi;
-      const authorization: Authorization[] = [];
-      const textEncoder = new TextEncoder();
-      const textDecoder = new TextDecoder();
-
       if (typeof abi === 'string') {
-        const bytes = hexToUint8Array(abi);
-        const abiTypes = Serialize.getTypesFromAbi(Serialize.createAbiTypes());
-        const buffer = new Serialize.SerialBuffer({
-          textEncoder,
-          textDecoder,
-          array: bytes,
-        });
-        buffer.restartRead();
-        contractAbi = abiTypes.get('abi_def').deserialize(buffer);
+        contractAbi = this.getAbiFromHex(abi);
       } else {
         contractAbi = abi as unknown as Abi;
       }
@@ -45,6 +103,8 @@ export class EosSerializer implements Serializer {
         Serialize.createInitialTypes(),
         contractAbi
       );
+
+      const authorization: Authorization[] = [];
       const actions = new Map();
       for (const { name, type } of contractAbi.actions) {
         actions.set(name, Serialize.getType(types, type));
@@ -90,19 +150,8 @@ export class EosSerializer implements Serializer {
   ): T {
     try {
       let contractAbi: Abi;
-      const textEncoder = new TextEncoder();
-      const textDecoder = new TextDecoder();
-
       if (typeof abi === 'string') {
-        const bytes = hexToUint8Array(abi);
-        const abiTypes = Serialize.getTypesFromAbi(Serialize.createAbiTypes());
-        const buffer = new Serialize.SerialBuffer({
-          textEncoder,
-          textDecoder,
-          array: bytes,
-        });
-        buffer.restartRead();
-        contractAbi = abiTypes.get('abi_def').deserialize(buffer);
+        contractAbi = this.getAbiFromHex(abi);
       } else {
         contractAbi = abi as unknown as Abi;
       }
@@ -132,7 +181,11 @@ export class EosSerializer implements Serializer {
         return null;
       }
 
-      const sb = new Serialize.SerialBuffer({ textEncoder, textDecoder, array: data });
+      const sb = new Serialize.SerialBuffer({
+        textEncoder: new TextEncoder(),
+        textDecoder: new TextDecoder(),
+        array: data,
+      });
 
       return contract.types.get(type).deserialize(sb) as T;
     } catch (e) {
@@ -240,7 +293,7 @@ export class EosSerializer implements Serializer {
 
   /**
    * Serializes a value to Uint8Array based on the given type.
-   * @abstract
+   *
    * @param {unknown} value - The value to be serialized.
    * @param {string} type - The type of the value to be serialized.
    * @param {Map<string, unknown>} types - The map of available types for serialization.
@@ -269,7 +322,7 @@ export class EosSerializer implements Serializer {
 
   /**
    * Deserializes a value from Uint8Array based on the given type.
-   * @abstract
+   *
    * @param {Uint8Array} value - The value to be deserialized as Uint8Array.
    * @param {string} type - The type of the value to be deserialized.
    * @param {Map<string, unknown>} types - The map of available types for deserialization.
@@ -303,7 +356,6 @@ export class EosSerializer implements Serializer {
   /**
    * Converts given hex string to Uint8Array.
    *
-   * @abstract
    * @param {string} value - The value to be serialized.
    * @returns {Uint8Array} The serialized value as Uint8Array.
    */
@@ -314,7 +366,6 @@ export class EosSerializer implements Serializer {
   /**
    * Converts given Uint8Array to hex string.
    *
-   * @abstract
    * @param {Uint8Array} value - The Uint8Array value to be converted.
    * @returns {Uint8Array} The serialized value as Uint8Array.
    */

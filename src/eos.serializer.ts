@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ContractTable, Serializer, UnknownObject, log } from '@alien-worlds/api-core';
+import { TableRow, Serializer, UnknownObject, log } from '@alien-worlds/api-core';
 import { Serialize } from 'eosjs';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { Anyvar, Authorization } from 'eosjs/dist/eosjs-serialize';
@@ -260,13 +260,13 @@ export class EosSerializer implements Serializer {
    *
    * @param {Uint8Array} data - The raw data to be deserialized.
    * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
-   * @returns {ContractTable<Type>} The deserialized table data.
+   * @returns {TableRow<Type>} The deserialized table data.
    */
   public deserializeTableRow<Type = unknown>(
     data: Uint8Array,
     abi?: string | UnknownObject,
     ...args: unknown[]
-  ): ContractTable<Type | Uint8Array> {
+  ): TableRow<Type | Uint8Array> {
     const sb = new Serialize.SerialBuffer({
       textEncoder: new TextEncoder(),
       textDecoder: new TextDecoder(),
@@ -287,7 +287,7 @@ export class EosSerializer implements Serializer {
       code,
       scope,
       table,
-      primaryKey: primaryKey.toString(),
+      primary_key: primaryKey.toString(),
       payer,
       data: deserializedData,
     };

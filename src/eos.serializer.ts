@@ -16,7 +16,7 @@ export class EosSerializer implements Serializer {
    * @param {string} hex - The hexadecimal representation of the ABI.
    * @returns {Abi} The deserialized ABI.
    */
-  public getAbiFromHex(hex: string): Abi {
+  public getAbiFromHex<AbiType = Abi>(hex: string): AbiType {
     const textEncoder = new TextEncoder();
     const textDecoder = new TextDecoder();
     const bytes = hexToUint8Array(hex);

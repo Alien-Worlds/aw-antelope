@@ -11,13 +11,12 @@ import { RawBlock } from './eos.serializer.types';
  */
 export class EosSerializer implements Serializer {
   /**
-   * Private method to deserialize ABI from hexadecimal representation.
+   * Method to deserialize ABI from hexadecimal representation.
    *
-   * @private
    * @param {string} hex - The hexadecimal representation of the ABI.
    * @returns {Abi} The deserialized ABI.
    */
-  private getAbiFromHex(hex: string): Abi {
+  public getAbiFromHex(hex: string): Abi {
     const textEncoder = new TextEncoder();
     const textDecoder = new TextDecoder();
     const bytes = hexToUint8Array(hex);
@@ -29,6 +28,19 @@ export class EosSerializer implements Serializer {
     });
     buffer.restartRead();
     return abiTypes.get('abi_def').deserialize(buffer);
+  }
+
+  /**
+   * Method to get types from provided ABI.
+   *
+   * @param {Abi} abi
+   * @returns {Map<string, Serialize.Type>}
+   */
+  public getTypesFromAbi<Type = Serialize.Type>(abi: UnknownObject): Map<string, Type> {
+    return Serialize.getTypesFromAbi(
+      Serialize.createAbiTypes(),
+      abi as unknown as Abi
+    ) as Map<string, Type>;
   }
 
   /**

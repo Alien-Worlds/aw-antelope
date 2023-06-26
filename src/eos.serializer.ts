@@ -2,7 +2,7 @@
 import { TableRow, Serializer, UnknownObject, log } from '@alien-worlds/api-core';
 import { Serialize } from 'eosjs';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
-import { Anyvar, Authorization } from 'eosjs/dist/eosjs-serialize';
+import { Anyvar, Authorization, arrayToHex } from 'eosjs/dist/eosjs-serialize';
 import { hexToUint8Array } from 'eosjs/dist/eosjs-serialize';
 import { RawBlock } from './eos.serializer.types';
 
@@ -31,12 +31,32 @@ export class EosSerializer implements Serializer {
   }
 
   /**
+   * Method to convert ABI to hexadecimal string.
+   *
+   * @param {AbiType} abi - The ABI object.
+   * @returns {string} The ABI hex string.
+   */
+  public getHexFromAbi<AbiType = Abi>(abi: AbiType): string {
+    const buffer = new Serialize.SerialBuffer({
+      textEncoder: new TextEncoder(),
+      textDecoder: new TextDecoder(),
+    });
+
+    const types = this.getTypesFromAbi(abi);
+    const type = types.get('abi_def');
+    type.serialize(buffer, abi);
+    return this.uint8ArrayToHex(buffer.asUint8Array());
+  }
+
+  /**
    * Method to get types from provided ABI.
    *
    * @param {Abi} abi
    * @returns {Map<string, Serialize.Type>}
    */
-  public getTypesFromAbi<Type = Serialize.Type>(abi: UnknownObject): Map<string, Type> {
+  public getTypesFromAbi<Type = Serialize.Type, AbiType = Abi>(
+    abi: AbiType
+  ): Map<string, Type> {
     return Serialize.getTypesFromAbi(
       Serialize.createAbiTypes(),
       abi as unknown as Abi
@@ -384,6 +404,6 @@ export class EosSerializer implements Serializer {
    * @returns {Uint8Array} The serialized value as Uint8Array.
    */
   public uint8ArrayToHex(value: Uint8Array): string {
-    return Buffer.from(value).toString('hex');
+    return arrayToHex(value);
   }
 }

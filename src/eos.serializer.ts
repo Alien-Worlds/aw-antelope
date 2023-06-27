@@ -10,6 +10,8 @@ import { RawBlock } from './eos.serializer.types';
  * Serializer implementation for EOS.
  */
 export class EosSerializer implements Serializer {
+  constructor(protected logErrors = true) {}
+
   /**
    * Method to deserialize ABI from hexadecimal representation.
    *
@@ -17,17 +19,24 @@ export class EosSerializer implements Serializer {
    * @returns {Abi} The deserialized ABI.
    */
   public getAbiFromHex<AbiType = Abi>(hex: string): AbiType {
-    const textEncoder = new TextEncoder();
-    const textDecoder = new TextDecoder();
-    const bytes = hexToUint8Array(hex);
-    const abiTypes = Serialize.getTypesFromAbi(Serialize.createAbiTypes());
-    const buffer = new Serialize.SerialBuffer({
-      textEncoder,
-      textDecoder,
-      array: bytes,
-    });
-    buffer.restartRead();
-    return abiTypes.get('abi_def').deserialize(buffer);
+    try {
+      const textEncoder = new TextEncoder();
+      const textDecoder = new TextDecoder();
+      const bytes = hexToUint8Array(hex);
+      const abiTypes = Serialize.getTypesFromAbi(Serialize.createAbiTypes());
+      const buffer = new Serialize.SerialBuffer({
+        textEncoder,
+        textDecoder,
+        array: bytes,
+      });
+      buffer.restartRead();
+      return abiTypes.get('abi_def').deserialize(buffer);
+    } catch (error) {
+      if (this.logErrors) {
+        log(`Unable to convert hex to abi. ${error.message}`);
+      }
+      return null;
+    }
   }
 
   /**
@@ -37,15 +46,22 @@ export class EosSerializer implements Serializer {
    * @returns {string} The ABI hex string.
    */
   public getHexFromAbi<AbiType = Abi>(abi: AbiType): string {
-    const buffer = new Serialize.SerialBuffer({
-      textEncoder: new TextEncoder(),
-      textDecoder: new TextDecoder(),
-    });
+    try {
+      const buffer = new Serialize.SerialBuffer({
+        textEncoder: new TextEncoder(),
+        textDecoder: new TextDecoder(),
+      });
 
-    const types = this.getTypesFromAbi(abi);
-    const type = types.get('abi_def');
-    type.serialize(buffer, abi);
-    return this.uint8ArrayToHex(buffer.asUint8Array());
+      const types = this.getTypesFromAbi(abi);
+      const type = types.get('abi_def');
+      type.serialize(buffer, abi);
+      return this.uint8ArrayToHex(buffer.asUint8Array());
+    } catch (error) {
+      if (this.logErrors) {
+        log(`Unable to convert abi to hex. ${error.message}`);
+      }
+      return '';
+    }
   }
 
   /**
@@ -57,10 +73,17 @@ export class EosSerializer implements Serializer {
   public getTypesFromAbi<Type = Serialize.Type, AbiType = Abi>(
     abi: AbiType
   ): Map<string, Type> {
-    return Serialize.getTypesFromAbi(
-      Serialize.createAbiTypes(),
-      abi as unknown as Abi
-    ) as Map<string, Type>;
+    try {
+      return Serialize.getTypesFromAbi(
+        Serialize.createAbiTypes(),
+        abi as unknown as Abi
+      ) as Map<string, Type>;
+    } catch (error) {
+      if (this.logErrors) {
+        log(`Unable to extract types from abi. ${error.message}`);
+      }
+      return new Map();
+    }
   }
 
   /**
@@ -76,37 +99,49 @@ export class EosSerializer implements Serializer {
     abi?: string | UnknownObject,
     ...args: unknown[]
   ): ReturnType {
-    let contractAbi: Abi;
+    try {
+      let contractAbi: Abi;
 
-    if (typeof abi === 'string') {
-      contractAbi = this.getAbiFromHex(abi);
-    } else {
-      contractAbi = abi as unknown as Abi;
+      if (typeof abi === 'string') {
+        contractAbi = this.getAbiFromHex(abi);
+      } else {
+        contractAbi = abi as unknown as Abi;
+      }
+
+      const types = Serialize.getTypesFromAbi(
+        Serialize.createInitialTypes(),
+        contractAbi
+      );
+      let block;
+      let traces;
+      let deltas;
+
+      if (data.block && data.block.length > 0) {
+        block = this.deserialize(data.block, 'signed_block', types);
+      }
+
+      if (data.traces && data.traces.length > 0) {
+        traces = this.deserialize(data.traces, 'transaction_trace[]', types);
+      }
+
+      if (data.deltas && data.deltas.length > 0) {
+        deltas = this.deserialize(data.deltas, 'table_delta[]', types);
+      }
+
+      return {
+        ...data,
+        block,
+        traces,
+        deltas,
+      } as ReturnType;
+    } catch (error) {
+      if (this.logErrors) {
+        log(
+          `Unable to deserialize block, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+        );
+      }
+      return null;
     }
-
-    const types = Serialize.getTypesFromAbi(Serialize.createInitialTypes(), contractAbi);
-    let block;
-    let traces;
-    let deltas;
-
-    if (data.block && data.block.length > 0) {
-      block = this.deserialize(data.block, 'signed_block', types);
-    }
-
-    if (data.traces && data.traces.length > 0) {
-      traces = this.deserialize(data.traces, 'transaction_trace[]', types);
-    }
-
-    if (data.deltas && data.deltas.length > 0) {
-      deltas = this.deserialize(data.deltas, 'table_delta[]', types);
-    }
-
-    return {
-      ...data,
-      block,
-      traces,
-      deltas,
-    } as ReturnType;
   }
 
   /**
@@ -162,7 +197,11 @@ export class EosSerializer implements Serializer {
 
       return deserializedAction.data as T;
     } catch (error) {
-      log(error);
+      if (this.logErrors) {
+        log(
+          `Unable to deserialize action data, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+        );
+      }
       return null;
     }
   }
@@ -222,7 +261,12 @@ export class EosSerializer implements Serializer {
       });
 
       return contract.types.get(type).deserialize(sb) as T;
-    } catch (e) {
+    } catch (error) {
+      if (this.logErrors) {
+        log(
+          `Unable to deserialize table row data, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+        );
+      }
       return null;
     }
   }
@@ -282,7 +326,11 @@ export class EosSerializer implements Serializer {
 
       return [version, { actions: deserializedActions }] as T;
     } catch (error) {
-      console.error('Error deserializing transaction:', error);
+      if (this.logErrors) {
+        log(
+          `Unable to deserialize transaction, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+        );
+      }
       return null;
     }
   }
@@ -299,30 +347,39 @@ export class EosSerializer implements Serializer {
     abi?: string | UnknownObject,
     ...args: unknown[]
   ): TableRow<Type | Uint8Array> {
-    const sb = new Serialize.SerialBuffer({
-      textEncoder: new TextEncoder(),
-      textDecoder: new TextDecoder(),
-      array: data,
-    });
-    sb.get();
-    const code = sb.getName();
-    const scope = sb.getName();
-    const table = sb.getName();
-    const primaryKey = Buffer.from(sb.getUint8Array(8)).readBigInt64BE();
-    const payer = sb.getName();
-    const bytes = sb.getBytes();
-    const deserializedData = abi
-      ? this.deserializeTableRowData<Type>(table, bytes, abi)
-      : bytes;
+    try {
+      const sb = new Serialize.SerialBuffer({
+        textEncoder: new TextEncoder(),
+        textDecoder: new TextDecoder(),
+        array: data,
+      });
+      sb.get();
+      const code = sb.getName();
+      const scope = sb.getName();
+      const table = sb.getName();
+      const primaryKey = Buffer.from(sb.getUint8Array(8)).readBigInt64BE();
+      const payer = sb.getName();
+      const bytes = sb.getBytes();
+      const deserializedData = abi
+        ? this.deserializeTableRowData<Type>(table, bytes, abi)
+        : bytes;
 
-    return {
-      code,
-      scope,
-      table,
-      primary_key: primaryKey.toString(),
-      payer,
-      data: deserializedData,
-    };
+      return {
+        code,
+        scope,
+        table,
+        primary_key: primaryKey.toString(),
+        payer,
+        data: deserializedData,
+      };
+    } catch (error) {
+      if (this.logErrors) {
+        log(
+          `Unable to deserialize table row, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+        );
+      }
+      return null;
+    }
   }
 
   /**
@@ -369,21 +426,30 @@ export class EosSerializer implements Serializer {
     types?: Map<string, Serialize.Type>,
     ...args: unknown[]
   ): Type {
-    const textEncoder = new TextEncoder();
-    const textDecoder = new TextDecoder();
-    const buffer = new Serialize.SerialBuffer({
-      textEncoder,
-      textDecoder,
-      array: value,
-    });
-    if (types && type) {
-      const result = Serialize.getType(types, type).deserialize(
-        buffer,
-        new Serialize.SerializerState({ bytesAsUint8Array: true })
-      );
-      return result;
-    } else {
-      return Serialize.deserializeAnyvar(buffer);
+    try {
+      const textEncoder = new TextEncoder();
+      const textDecoder = new TextDecoder();
+      const buffer = new Serialize.SerialBuffer({
+        textEncoder,
+        textDecoder,
+        array: value,
+      });
+      if (types && type) {
+        const result = Serialize.getType(types, type).deserialize(
+          buffer,
+          new Serialize.SerializerState({ bytesAsUint8Array: true })
+        );
+        return result;
+      } else {
+        return Serialize.deserializeAnyvar(buffer);
+      }
+    } catch (error) {
+      if (this.logErrors) {
+        log(
+          `Unable to deserialize data, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+        );
+      }
+      return null;
     }
   }
 

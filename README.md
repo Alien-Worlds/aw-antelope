@@ -1,1 +1,74 @@
-# eos
+# EOS
+
+The EOS is part of the AlienWorlds open source project. This repository consists of three main components: **Blockchain Service**, **Smart Contract Service**, and **Serializer**.
+
+## Dependencies
+
+- [@alien-worlds/api-core](https://github.com/Alien-Worlds/api-core)
+- [eosjs](https://github.com/EOSIO/eosjs)
+
+
+## Table of Contents
+
+- [Blockchain Service](#blockchain-service)
+- [Smart Contract Service](#smart-contract-service)
+- [Serializer](#serializer)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Blockchain Service
+
+The Blockchain Service is responsible for handling various blockchain-related operations. This service exposes three main methods:
+
+- `getInfo()`: Retrieves the blockchain information.
+- `getHeadBlockNumber()`: Retrieves the block number of the head block.
+- `getLastIrreversibleBlockNumber()`: Retrieves the block number of the last irreversible block.
+
+## Smart Contract Service
+
+The Smart Contract Service manages operations related to smart contracts. The service currently implements the following method:
+
+- `getStats(contract: string)`: Retrieves the statistics of the given smart contract.
+
+Smart Contract Service is designed not only to fetch contract statistics. The service has protected methods to fetch table data (`getOne`, `getMany` and `getAll`). Thanks to these methods, you can write your own to retrieve data from each of the tables contained in the contract. Examples of use can be found in dedicated contract packages such as [dao-worlds-common](https://github.com/Alien-Worlds/dao-worlds-common/tree/main/src/services
+)
+
+```java
+// example of retrieving table data "Candidates"
+public readonly fetchCandidates = async (
+  options?: GetTableRowsOptions
+): Promise<Result<CandidatesRawModel[], Error>> => {
+  return await this.getAll<CandidatesRawModel>('candidate_name', {
+    ...options,
+    code: 'dao.worlds',
+    table: 'candidates',
+    table_key: 'candidate_name',
+  });
+};
+
+```
+
+## Serializer
+
+The Serializer is responsible for the serialization and deserialization of various data types. It provides the following methods:
+
+- `getAbiFromHex(hex: string)`: Deserializes ABI from hexadecimal representation.
+- `getHexFromAbi(abi: AbiType)`: Converts ABI to hexadecimal string.
+- `getTypesFromAbi(abi: UnknownObject)`: Gets types from provided ABI.
+- `serialize(value: unknown, type: string, types: Map<string, unknown>)`: Serializes a value to Uint8Array based on the given type.
+- `deserialize(value: Uint8Array, type: string, types: Map<string, unknown>)`: Deserializes a value from Uint8Array based on the given type.
+- `deserializeActionData(contract: string, action: string, data: Uint8Array, abi: string | UnknownObject)`: Deserializes the action data for a specific account and action.
+- `deserializeTableRow(row: Uint8Array, abi: string | UnknownObject)`: Deserializes the table row.
+- `deserializeTableRowData(table: string, data: Uint8Array, abi: string | UnknownObject)`: Deserializes a table delta for a specific table.
+- `deserializeTransaction(contract: string, data: Uint8Array, abi: string | UnknownObject)`: Deserializes a transaction for a specific contract.
+- `deserializeBlock(data: DataType, abi: string | UnknownObject)`: Deserializes a block.
+- `hexToUint8Array(value: string)`: Converts a hexadecimal string to Uint8Array.
+- `uint8ArrayToHex(value: Uint8Array)`: Converts a Uint8Array to a hexadecimal string.
+
+## Contributing
+
+We welcome contributions from the community. Before contributing, please read through the existing issues on this repository to prevent duplicate submissions. New feature requests and bug reports can be submitted as an issue. If you would like to contribute code, please open a pull request.
+
+## License
+
+This project is licensed under the terms of the MIT license. For more information, refer to the [LICENSE](./LICENSE) file.

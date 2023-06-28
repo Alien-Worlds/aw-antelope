@@ -10,11 +10,21 @@ The EOS is part of the AlienWorlds open source project. This repository consists
 
 ## Table of Contents
 
+- [Installation](#installation)
 - [Blockchain Service](#blockchain-service)
 - [Smart Contract Service](#smart-contract-service)
 - [Serializer](#serializer)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Installation
+
+To install the `@alien-worlds/eos` package, use the following command:
+
+```bash
+yarn add @alien-worlds/storage-mongodb
+```
+
 
 ## Blockchain Service
 

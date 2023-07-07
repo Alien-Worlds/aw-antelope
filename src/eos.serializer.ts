@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { TableRow, Serializer, UnknownObject, log } from '@alien-worlds/api-core';
+import { TableRow, Serializer, UnknownObject, log, Row } from '@alien-worlds/api-core';
 import { Serialize } from 'eosjs';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { Anyvar, Authorization, arrayToHex } from 'eosjs/dist/eosjs-serialize';
@@ -343,11 +343,12 @@ export class EosSerializer implements Serializer {
    * @returns {TableRow<Type>} The deserialized table data.
    */
   public deserializeTableRow<Type = unknown>(
-    data: Uint8Array,
+    row: Row,
     abi?: string | UnknownObject,
     ...args: unknown[]
   ): TableRow<Type | Uint8Array> {
     try {
+      const { data, present } = row;
       const sb = new Serialize.SerialBuffer({
         textEncoder: new TextEncoder(),
         textDecoder: new TextDecoder(),
@@ -370,6 +371,7 @@ export class EosSerializer implements Serializer {
         table,
         primary_key: primaryKey.toString(),
         payer,
+        present,
         data: deserializedData,
       };
     } catch (error) {

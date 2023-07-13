@@ -7,7 +7,6 @@ The EOS is part of the AlienWorlds open source project. This repository consists
 - [@alien-worlds/api-core](https://github.com/Alien-Worlds/api-core)
 - [eosjs](https://github.com/EOSIO/eosjs)
 
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -22,9 +21,8 @@ The EOS is part of the AlienWorlds open source project. This repository consists
 To install the `@alien-worlds/eos` package, use the following command:
 
 ```bash
-yarn add @alien-worlds/storage-mongodb
+yarn add @alien-worlds/eos
 ```
-
 
 ## Blockchain Service
 
@@ -40,10 +38,9 @@ The Smart Contract Service manages operations related to smart contracts. The se
 
 - `getStats(contract: string)`: Retrieves the statistics of the given smart contract.
 
-Smart Contract Service is designed not only to fetch contract statistics. The service has protected methods to fetch table data (`getOne`, `getMany` and `getAll`). Thanks to these methods, you can write your own to retrieve data from each of the tables contained in the contract. Examples of use can be found in dedicated contract packages such as [dao-worlds-common](https://github.com/Alien-Worlds/dao-worlds-common/tree/main/src/services
-)
+Smart Contract Service is designed not only to fetch contract statistics. The service has protected methods to fetch table data (`getOne`, `getMany` and `getAll`). Thanks to these methods, you can write your own to retrieve data from each of the tables contained in the contract. Examples of use can be found in dedicated contract packages such as [dao-worlds-common](https://github.com/Alien-Worlds/dao-worlds-common/tree/main/src/services)
 
-```java
+```typescript
 // example of retrieving table data "Candidates"
 public readonly fetchCandidates = async (
   options?: GetTableRowsOptions

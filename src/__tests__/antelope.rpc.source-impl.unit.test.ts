@@ -1,5 +1,5 @@
 import { AntelopeRpcSourceImpl } from '../antelope.rpc.source-impl';
-import { BlockchainInfo } from '@alien-worlds/api-core';
+import { BlockchainInfo } from '@alien-worlds/aw-core';
 import { JsonRpc } from 'eosjs';
 
 jest.mock('eosjs');

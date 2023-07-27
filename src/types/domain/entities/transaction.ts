@@ -1,7 +1,7 @@
 import { Action } from './action';
 import { Extension } from './extension';
 import { TransactionRawModel } from '../../data';
-import { Entity, UnknownObject } from '@alien-worlds/api-core';
+import { Entity, UnknownObject } from '@alien-worlds/aw-core';
 
 export class Transaction implements Entity {
   public static create(

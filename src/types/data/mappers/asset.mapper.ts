@@ -1,8 +1,8 @@
-import { MapperImpl } from '@alien-worlds/api-core';
+import { AssetMongoModel, AssetRawModel } from '../dtos/asset.dto';
 
 import { Asset } from '../../domain/entities';
-import { AssetMongoModel, AssetRawModel } from '../dtos/asset.dto';
-import { MongoMapper } from '@alien-worlds/storage-mongodb';
+import { MapperImpl } from '@alien-worlds/aw-core';
+import { MongoMapper } from '@alien-worlds/aw-storage-mongodb';
 
 // Mongo Mappers
 export class AssetMongoMapper extends MongoMapper<Asset, AssetMongoModel> {

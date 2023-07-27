@@ -1,5 +1,5 @@
 import { AntelopeBlockchainServiceImpl } from '../antelope.blockchain.service-impl';
-import { Result } from '@alien-worlds/api-core';
+import { Result } from '@alien-worlds/aw-core';
 
 describe('BlockchainServiceImpl', () => {
   let rpc;

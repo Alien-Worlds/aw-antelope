@@ -1,8 +1,8 @@
-import { MapperImpl } from '@alien-worlds/api-core';
+import { BytesMongoModel, BytesRawModel } from '../dtos/bytes.dto';
+import { MongoDB, MongoMapper } from '@alien-worlds/aw-storage-mongodb';
 
 import { Bytes } from '../../domain/entities';
-import { MongoDB, MongoMapper } from '@alien-worlds/storage-mongodb';
-import { BytesMongoModel, BytesRawModel } from '../dtos/bytes.dto';
+import { MapperImpl } from '@alien-worlds/aw-core';
 
 // Mongo Mappers
 export class BytesMongoMapper extends MongoMapper<Bytes, BytesMongoModel> {

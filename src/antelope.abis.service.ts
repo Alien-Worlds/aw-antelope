@@ -1,4 +1,4 @@
-import { AbiService, ContractEncodedAbi } from '@alien-worlds/api-core';
+import { AbiService, ContractEncodedAbi } from '@alien-worlds/aw-core';
 
 import { AbiServiceConfig } from './antelope.abis.types';
 import fetch from 'node-fetch';

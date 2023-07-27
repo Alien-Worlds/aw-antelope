@@ -1,5 +1,5 @@
 import { AntelopeSmartContractServiceImpl } from '../antelope.smart-contract.service-impl';
-import { Result } from '@alien-worlds/api-core';
+import { Result } from '@alien-worlds/aw-core';
 
 const rpc = {
   getTableRows: jest.fn(),

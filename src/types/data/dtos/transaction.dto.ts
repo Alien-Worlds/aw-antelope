@@ -1,6 +1,7 @@
-import { MongoDB } from '@alien-worlds/storage-mongodb';
 import { ActionMongoModel, ActionRawModel } from './action.dto';
 import { ExtensionMongoModel, ExtensionRawModel } from './extension.dto';
+
+import { MongoDB } from '@alien-worlds/aw-storage-mongodb';
 
 export type TransactionMongoModel = {
   expiration: Date;

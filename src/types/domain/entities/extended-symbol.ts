@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Entity, UnknownObject } from '@alien-worlds/api-core';
+import { Entity, UnknownObject } from '@alien-worlds/aw-core';
 import { Symbol } from './symbol';
 
 /**

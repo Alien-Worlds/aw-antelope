@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { SymbolMongoModel, SymbolRawModel } from '../dtos/symbol.dto';
 
-import { MapperImpl } from '@alien-worlds/api-core';
+import { MapperImpl } from '@alien-worlds/aw-core';
+import { MongoMapper } from '@alien-worlds/aw-storage-mongodb';
 import { Symbol } from '../../domain/entities';
-import { MongoMapper } from '@alien-worlds/storage-mongodb';
 
 // Mongo Mappers
 export class SymbolMongoMapper extends MongoMapper<Symbol, SymbolMongoModel> {

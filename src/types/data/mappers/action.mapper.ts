@@ -1,13 +1,13 @@
-import { MapperImpl } from '@alien-worlds/api-core';
-
 import { Action, PermissionLevel } from '../../domain/entities';
 import { ActionMongoModel, ActionRawModel } from '../dtos/action.dto';
+import { BytesMongoMapper, BytesRawMapper } from './bytes.mapper';
 import {
   PermissionLevelMongoMapper,
   PermissionLevelRawMapper,
 } from './permission-level.mapper';
-import { BytesMongoMapper, BytesRawMapper } from './bytes.mapper';
-import { MongoMapper } from '@alien-worlds/storage-mongodb';
+
+import { MapperImpl } from '@alien-worlds/aw-core';
+import { MongoMapper } from '@alien-worlds/aw-storage-mongodb';
 
 // Mongo Mappers
 export class ActionMongoMapper extends MongoMapper<Action, ActionMongoModel> {

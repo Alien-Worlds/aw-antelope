@@ -4,7 +4,7 @@ The AW-Antelope is part of the AlienWorlds open source project. This repository 
 
 ## Dependencies
 
-- [@alien-worlds/api-core](https://github.com/Alien-Worlds/api-core)
+- [@alien-worlds/aw-core](https://github.com/Alien-Worlds/aw-core)
 - [eosjs](https://github.com/EOSIO/eosjs)
 
 ## Table of Contents

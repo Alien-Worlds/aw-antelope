@@ -1,11 +1,11 @@
-import { MapperImpl } from '@alien-worlds/api-core';
-
-import { PermissionLevel } from '../../domain/entities';
 import {
   PermissionLevelMongoModel,
   PermissionLevelRawModel,
 } from '../dtos/permission-level.dto';
-import { MongoMapper } from '@alien-worlds/storage-mongodb';
+
+import { MapperImpl } from '@alien-worlds/aw-core';
+import { MongoMapper } from '@alien-worlds/aw-storage-mongodb';
+import { PermissionLevel } from '../../domain/entities';
 
 // Mongo Mappers
 export class PermissionLevelMongoMapper extends MongoMapper<

@@ -2,30 +2,21 @@
 # yarn lockfile v1
 
 
-"@alien-worlds/api-core@^0.0.158":
-  version "0.0.158"
-  resolved "https://npm.pkg.github.com/download/@alien-worlds/api-core/0.0.158/92cb2bb3a2168e07fa7a8e240895f5133105e0ee#92cb2bb3a2168e07fa7a8e240895f5133105e0ee"
-  integrity sha512-PIrmouUmomBUTZ1tkNKzU/0cHcvY9L/puAYljvnDlwZ5yAJECgbgVuxEqlQVbMne2kXQwW0c1U7GCfP877Zt6w==
+"@alien-worlds/aw-core@^0.0.1":
+  version "0.0.1"
+  resolved "https://npm.pkg.github.com/download/@alien-worlds/aw-core/0.0.1/f4c39d3bb7b582860d0d06ed68a65ff55f7e1dfe#f4c39d3bb7b582860d0d06ed68a65ff55f7e1dfe"
+  integrity sha512-BfLmVMsKPymiAFQe/rG/19jAS3oVRl9ZMg7VdEcL33XXFXDc1n7Xb3J6mcalhqHOsdYOIf9plGgDFyRdjv5mMg==
   dependencies:
     inversify "^6.0.1"
     node-fetch "2.6.6"
     reflect-metadata "^0.1.13"
 
-"@alien-worlds/api-core@^0.0.160":
-  version "0.0.160"
-  resolved "https://npm.pkg.github.com/download/@alien-worlds/api-core/0.0.160/759aab5f8dda758bc930732be65066d38878843d#759aab5f8dda758bc930732be65066d38878843d"
-  integrity sha512-d7A9ZBqbKULV9K6XzOBR8fBSPZsE7Djw8jmCSM3Z9fCGQVz11BaeZSIEt/LqMhTF1nUgR3nYtYeSkExSeNaajg==
+"@alien-worlds/aw-storage-mongodb@^0.0.2":
+  version "0.0.2"
+  resolved "https://npm.pkg.github.com/download/@alien-worlds/aw-storage-mongodb/0.0.2/244849aed48ea517fd40bfdb43a76059a01f69ba#244849aed48ea517fd40bfdb43a76059a01f69ba"
+  integrity sha512-6+zvtmDICDKTwCAX+SNiNpvNiHhTPKcebF6v6j+oKzYp81TBKJwqFC+jwRNlGd5dv/u+T9OoQL0R1OayZ+7kVg==
   dependencies:
-    inversify "^6.0.1"
-    node-fetch "2.6.6"
-    reflect-metadata "^0.1.13"
-
-"@alien-worlds/storage-mongodb@^0.0.28":
-  version "0.0.28"
-  resolved "https://npm.pkg.github.com/download/@alien-worlds/storage-mongodb/0.0.28/e3000595309890caeda9c6feb1861b316123b37c#e3000595309890caeda9c6feb1861b316123b37c"
-  integrity sha512-uh266auXFb0ye/XnKEvmacm/DakrBcv0i4ZwvjmfGs/8isUt75jqKLP/hW9fW/+npRSdnkLJ1EI+qkQ2fXclPg==
-  dependencies:
-    "@alien-worlds/api-core" "^0.0.158"
+    "@alien-worlds/aw-core" "^0.0.1"
     mongodb "4.9.1"
 
 "@ampproject/remapping@^2.2.0":

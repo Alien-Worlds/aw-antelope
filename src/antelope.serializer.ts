@@ -1,6 +1,6 @@
 import { Anyvar, Authorization, arrayToHex } from 'eosjs/dist/eosjs-serialize';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Row, Serializer, TableRow, UnknownObject, log } from '@alien-worlds/api-core';
+import { Row, Serializer, TableRow, UnknownObject, log } from '@alien-worlds/aw-core';
 
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { RawBlock } from './antelope.serializer.types';

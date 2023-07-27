@@ -1,4 +1,4 @@
-import { removeUndefinedProperties } from '@alien-worlds/api-core';
+import { removeUndefinedProperties } from '@alien-worlds/aw-core';
 import { PairModel } from '../../data';
 
 export class Pair<KeyType = string, ValueType = string> {

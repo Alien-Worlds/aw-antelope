@@ -1,4 +1,4 @@
-import { Entity, UnknownObject } from '@alien-worlds/api-core';
+import { Entity, UnknownObject } from '@alien-worlds/aw-core';
 import { PermissionLevelRawModel } from '../../data';
 
 export class PermissionLevel implements Entity {

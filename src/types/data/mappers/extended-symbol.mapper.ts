@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import { MapperImpl } from '@alien-worlds/api-core';
-
-import { Symbol } from '../../domain/entities';
-import { ExtendedSymbol } from '../../domain/entities/extended-symbol';
 import { ExtendedSymbolMongoModel, ExtendedSymbolRawModel } from '../dtos';
 import { SymbolMongoMapper, SymbolRawMapper } from './symbol.mapper';
-import { MongoMapper } from '@alien-worlds/storage-mongodb';
+
+import { ExtendedSymbol } from '../../domain/entities/extended-symbol';
+/* eslint-disable @typescript-eslint/ban-types */
+import { MapperImpl } from '@alien-worlds/aw-core';
+import { MongoMapper } from '@alien-worlds/aw-storage-mongodb';
+import { Symbol } from '../../domain/entities';
 
 // Mongo Mappers
 export class ExtendedSymbolMongoMapper extends MongoMapper<

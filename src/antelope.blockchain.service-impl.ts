@@ -4,7 +4,7 @@ import {
   Failure,
   Result,
   RpcSource,
-} from '@alien-worlds/api-core';
+} from '@alien-worlds/aw-core';
 
 /**
  * Implementation of the BlockchainService interface that communicates with a blockchain network.

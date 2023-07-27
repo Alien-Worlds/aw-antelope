@@ -1,8 +1,9 @@
-import { MongoDB } from '@alien-worlds/storage-mongodb';
 import {
   PermissionLevelMongoModel,
   PermissionLevelRawModel,
 } from './permission-level.dto';
+
+import { MongoDB } from '@alien-worlds/aw-storage-mongodb';
 
 /**
  * @typedef {Object} ActionMongoModel

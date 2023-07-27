@@ -4,7 +4,7 @@ import {
   GetTableRowsOptions,
   RpcSource,
   parseToBigInt,
-} from '@alien-worlds/api-core';
+} from '@alien-worlds/aw-core';
 
 import { GetTableRowsResult } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { JsonRpc } from 'eosjs';

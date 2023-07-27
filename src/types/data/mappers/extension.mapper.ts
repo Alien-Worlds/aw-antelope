@@ -1,8 +1,8 @@
-import { MapperImpl } from '@alien-worlds/api-core';
+import { ExtensionMongoModel, ExtensionRawModel } from '../dtos/extension.dto';
 
 import { Extension } from '../../domain/entities';
-import { ExtensionMongoModel, ExtensionRawModel } from '../dtos/extension.dto';
-import { MongoMapper } from '@alien-worlds/storage-mongodb';
+import { MapperImpl } from '@alien-worlds/aw-core';
+import { MongoMapper } from '@alien-worlds/aw-storage-mongodb';
 
 // Mongo Mappers
 export class ExtensionMongoMapper extends MongoMapper<Extension, ExtensionMongoModel> {

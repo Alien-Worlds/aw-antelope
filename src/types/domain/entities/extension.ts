@@ -1,4 +1,4 @@
-import { Entity, UnknownObject } from '@alien-worlds/api-core';
+import { Entity, UnknownObject } from '@alien-worlds/aw-core';
 import { ExtensionRawModel } from '../../data/dtos/extension.dto';
 
 export class Extension implements Entity {

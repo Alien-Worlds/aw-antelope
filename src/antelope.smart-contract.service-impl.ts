@@ -7,7 +7,7 @@ import {
   SmartContractDataNotFoundError,
   SmartContractService,
   log,
-} from '@alien-worlds/api-core';
+} from '@alien-worlds/aw-core';
 
 import { FetchContractResponse } from './antelope.smart-contract.types';
 import fetch from 'node-fetch';

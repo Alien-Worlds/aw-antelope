@@ -1,5 +1,5 @@
 import { AntelopeAbisService } from '../antelope.abis.service';
-import { ContractEncodedAbi } from '@alien-worlds/api-core';
+import { ContractEncodedAbi } from '@alien-worlds/aw-core';
 import fetch from 'node-fetch';
 
 // Mock dependencies

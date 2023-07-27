@@ -1,4 +1,4 @@
-import { Entity, UnknownObject } from '@alien-worlds/api-core';
+import { Entity, UnknownObject } from '@alien-worlds/aw-core';
 import { ActionRawModel } from '../../data';
 import { Bytes } from './bytes';
 import { PermissionLevel } from './permission-level';

@@ -1,6 +1,6 @@
-# Antelope
+# AW-Antelope
 
-The Antelope is part of the AlienWorlds open source project. This repository consists of three main components: **Blockchain Service**, **Smart Contract Service**, and **Serializer**.
+The AW-Antelope is part of the AlienWorlds open source project. This repository consists of three main components: **Blockchain Service**, **Smart Contract Service**, and **Serializer**.
 
 ## Dependencies
 
@@ -18,10 +18,10 @@ The Antelope is part of the AlienWorlds open source project. This repository con
 
 ## Installation
 
-To install the `@alien-worlds/antelope` package, use the following command:
+To install the `@alien-worlds/aw-antelope` package, use the following command:
 
 ```bash
-yarn add @alien-worlds/antelope
+yarn add @alien-worlds/aw-antelope
 ```
 
 ## Blockchain Service

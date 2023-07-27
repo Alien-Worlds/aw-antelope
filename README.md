@@ -5,11 +5,13 @@ The AW-Antelope is part of the AlienWorlds open source project. This repository 
 ## Dependencies
 
 - [@alien-worlds/aw-core](https://github.com/Alien-Worlds/aw-core)
+- [@alien-worlds/aw-storage-mongodb](https://github.com/Alien-Worlds/aw-storage-mongodb)
 - [eosjs](https://github.com/EOSIO/eosjs)
 
 ## Table of Contents
 
 - [Installation](#installation)
+- [Block Reader](#block-reader)
 - [Blockchain Service](#blockchain-service)
 - [Smart Contract Service](#smart-contract-service)
 - [Serializer](#serializer)
@@ -23,6 +25,20 @@ To install the `@alien-worlds/aw-antelope` package, use the following command:
 ```bash
 yarn add @alien-worlds/aw-antelope
 ```
+
+## Block Reader
+
+Block Reader is responsible for managing the connection to a block reader service and handling block retrieval. It plays a crucial role in ensuring the correct interaction with the blockchain, retrieving all necessary information, and forwarding it to the appropriate handlers.
+
+### Features
+
+1. Connects to a State History Plugin SHIP.
+2. Manages the WebSocket connection using a `AntelopeBlockReaderSource` instance.
+3. Handles SHIP abis using a `AntelopeShipAbiRepository` instance.
+4. Serializes and deserializes messages with a `Serializer` instance.
+5. Manages the retrieval of blocks, with the ability to pause and resume this process.
+6. Provides callback handlers for various events (such as receiving blocks, completion of block range retrieval, handling errors, and handling warnings).
+
 
 ## Blockchain Service
 
@@ -38,7 +54,7 @@ The Smart Contract Service manages operations related to smart contracts. The se
 
 - `getStats(contract: string)`: Retrieves the statistics of the given smart contract.
 
-Smart Contract Service is designed not only to fetch contract statistics. The service has protected methods to fetch table data (`getOne`, `getMany` and `getAll`). Thanks to these methods, you can write your own to retrieve data from each of the tables contained in the contract. Examples of use can be found in dedicated contract packages such as [dao-worlds-common](https://github.com/Alien-Worlds/dao-worlds-common/tree/main/src/services)
+Smart Contract Service is designed not only to fetch contract statistics. The service has protected methods to fetch table data (`getOne`, `getMany` and `getAll`). Thanks to these methods, you can write your own to retrieve data from each of the tables contained in the contract. Examples of use can be found in dedicated contract packages such as [aw-contract-dao-worlds](https://github.com/Alien-Worlds/aw-contract-dao-worlds/tree/main/src/services)
 
 ```typescript
 // example of retrieving table data "Candidates"
@@ -68,7 +84,7 @@ The Serializer is responsible for the serialization and deserialization of vario
 - `deserializeTableRow(row: Uint8Array, abi: string | UnknownObject)`: Deserializes the table row.
 - `deserializeTableRowData(table: string, data: Uint8Array, abi: string | UnknownObject)`: Deserializes a table delta for a specific table.
 - `deserializeTransaction(contract: string, data: Uint8Array, abi: string | UnknownObject)`: Deserializes a transaction for a specific contract.
-- `deserializeBlock(data: DataType, abi: string | UnknownObject)`: Deserializes a block.
+- `deserializeBlock(data: DataType, abi?: string | UnknownObject)`: Deserializes a block.
 - `hexToUint8Array(value: string)`: Converts a hexadecimal string to Uint8Array.
 - `uint8ArrayToHex(value: Uint8Array)`: Converts a Uint8Array to a hexadecimal string.
 

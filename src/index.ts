@@ -1,3 +1,4 @@
+export * from './antelope-block-reader';
 export * from './antelope.abis.service';
 export * from './antelope.abis.types';
 export * from './antelope.blockchain.service-impl';

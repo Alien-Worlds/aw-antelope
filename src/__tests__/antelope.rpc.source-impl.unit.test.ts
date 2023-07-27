@@ -1,4 +1,4 @@
-import { AntelopeRpcSourceImpl } from '../antelope.rpc.source-impl';
+import { AntelopeRpcSourceImpl } from '../blockchain/antelope.rpc.source-impl';
 import { BlockchainInfo } from '@alien-worlds/aw-core';
 import { JsonRpc } from 'eosjs';
 

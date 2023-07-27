@@ -1,4 +1,4 @@
-import { AntelopeBlockchainServiceImpl } from '../antelope.blockchain.service-impl';
+import { AntelopeBlockchainServiceImpl } from '../blockchain/antelope.blockchain.service-impl';
 import { Result } from '@alien-worlds/aw-core';
 
 describe('BlockchainServiceImpl', () => {

@@ -1,5 +1,5 @@
+import { AntelopeBlockchainServiceImpl } from '../antelope.blockchain.service-impl';
 import { Result } from '@alien-worlds/api-core';
-import { EosBlockchainServiceImpl } from '../eos.blockchain.service-impl';
 
 describe('BlockchainServiceImpl', () => {
   let rpc;
@@ -12,7 +12,7 @@ describe('BlockchainServiceImpl', () => {
       getLastIrreversibleBlockNumber: jest.fn(),
     };
 
-    blockchainService = new EosBlockchainServiceImpl(rpc);
+    blockchainService = new AntelopeBlockchainServiceImpl(rpc);
   });
 
   describe('getInfo', () => {

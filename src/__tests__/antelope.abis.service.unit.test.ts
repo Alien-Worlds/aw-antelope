@@ -1,14 +1,14 @@
-import fetch from 'node-fetch';
-import { EosAbisService } from '../eos.abis.service';
+import { AntelopeAbisService } from '../antelope.abis.service';
 import { ContractEncodedAbi } from '@alien-worlds/api-core';
+import fetch from 'node-fetch';
 
 // Mock dependencies
 jest.mock('node-fetch');
 
 const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
 
-describe('EosAbisService', () => {
-  let abisService: EosAbisService;
+describe('AntelopeAbisService', () => {
+  let abisService: AntelopeAbisService;
   const config = {
     url: 'https://example.com',
     limit: 100,
@@ -18,7 +18,7 @@ describe('EosAbisService', () => {
   beforeEach(() => {
     // Reset mocks and create a new instance of AbisService
     jest.resetAllMocks();
-    abisService = new EosAbisService(config);
+    abisService = new AntelopeAbisService(config);
   });
 
   describe('fetchAbis', () => {

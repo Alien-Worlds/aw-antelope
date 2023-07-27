@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import fetch from 'node-fetch';
-import { JsonRpc } from 'eosjs';
-import { GetTableRowsResult } from 'eosjs/dist/eosjs-rpc-interfaces';
 import {
   BlockchainInfo,
   ContractStats,
@@ -10,17 +6,22 @@ import {
   parseToBigInt,
 } from '@alien-worlds/api-core';
 
+import { GetTableRowsResult } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { JsonRpc } from 'eosjs';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import fetch from 'node-fetch';
+
 /**
- * EosRpcSource class represents a source for making RPC requests to an EOS blockchain.
+ * AntelopeRpcSource class represents a source for making RPC requests to an Antelope blockchain.
  * It implements the RpcSource interface.
  * @class
  */
-export class EosRpcSourceImpl implements RpcSource {
+export class AntelopeRpcSourceImpl implements RpcSource {
   private rpc: JsonRpc;
 
   /**
-   * Creates an instance of `EosJsRpcSource`.
-   * @param {string} url - The URL of the EOS RPC endpoint.
+   * Creates an instance of `AntelopeJsRpcSource`.
+   * @param {string} url - The URL of the Antelope RPC endpoint.
    */
   constructor(url: string) {
     this.rpc = new JsonRpc(url, { fetch });

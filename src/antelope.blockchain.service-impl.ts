@@ -10,7 +10,7 @@ import {
  * Implementation of the BlockchainService interface that communicates with a blockchain network.
  * @implements {BlockchainService}
  */
-export class EosBlockchainServiceImpl implements BlockchainService {
+export class AntelopeBlockchainServiceImpl implements BlockchainService {
   /**
    * Creates an instance of BlockchainServiceImpl.
    * @param {RpcSource} rpc - The RPC data source used to communicate with the blockchain network.

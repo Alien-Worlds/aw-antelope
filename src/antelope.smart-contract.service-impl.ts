@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import {
   ContractStats,
   Failure,
@@ -9,14 +8,16 @@ import {
   SmartContractService,
   log,
 } from '@alien-worlds/api-core';
-import { FetchContractResponse } from './eos.smart-contract.types';
+
+import { FetchContractResponse } from './antelope.smart-contract.types';
+import fetch from 'node-fetch';
 
 /**
  * SmartContractServiceImpl class implements the SmartContractService interface and provides
  * the implementation for interacting with smart contracts.
  * @class
  */
-export class EosSmartContractServiceImpl implements SmartContractService {
+export class AntelopeSmartContractServiceImpl implements SmartContractService {
   /**
    * Creates an instance of SmartContractServiceImpl.
    * @param {RpcSource} rpcSource - The RPC source for making blockchain requests.

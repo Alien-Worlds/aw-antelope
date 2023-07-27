@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { TableRow, Serializer, UnknownObject, log, Row } from '@alien-worlds/api-core';
-import { Serialize } from 'eosjs';
-import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { Anyvar, Authorization, arrayToHex } from 'eosjs/dist/eosjs-serialize';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Row, Serializer, TableRow, UnknownObject, log } from '@alien-worlds/api-core';
+
+import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { RawBlock } from './antelope.serializer.types';
+import { Serialize } from 'eosjs';
 import { hexToUint8Array } from 'eosjs/dist/eosjs-serialize';
-import { RawBlock } from './eos.serializer.types';
 
 /**
- * Serializer implementation for EOS.
+ * Serializer implementation for Antelope.
  */
-export class EosSerializer implements Serializer {
+export class AntelopeSerializer implements Serializer {
   constructor(protected logErrors = true) {}
 
   /**

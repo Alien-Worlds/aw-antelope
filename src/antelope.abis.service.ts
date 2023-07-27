@@ -1,11 +1,12 @@
 import { AbiService, ContractEncodedAbi } from '@alien-worlds/api-core';
+
+import { AbiServiceConfig } from './antelope.abis.types';
 import fetch from 'node-fetch';
-import { AbiServiceConfig } from './eos.abis.types';
 
 /**
  * Represents a service for fetching ABIs (Application Binary Interfaces).
  */
-export class EosAbisService implements AbiService {
+export class AntelopeAbisService implements AbiService {
   /**
    * Constructs a new instance of the AbisService class.
    *

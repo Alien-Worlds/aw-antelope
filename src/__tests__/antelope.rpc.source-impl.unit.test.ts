@@ -1,10 +1,10 @@
+import { AntelopeRpcSourceImpl } from '../antelope.rpc.source-impl';
 import { BlockchainInfo } from '@alien-worlds/api-core';
-import { EosRpcSourceImpl } from '../eos.rpc.source-impl';
 import { JsonRpc } from 'eosjs';
 
 jest.mock('eosjs');
 
-describe('EosRpcSource', () => {
+describe('AntelopeRpcSource', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -17,7 +17,7 @@ describe('EosRpcSource', () => {
     }));
 
     const account = 'example_account';
-    const rpcSource = new EosRpcSourceImpl('http://example.com');
+    const rpcSource = new AntelopeRpcSourceImpl('http://example.com');
 
     await rpcSource.getContractStats(account);
 
@@ -35,7 +35,7 @@ describe('EosRpcSource', () => {
       code: 'example_code',
       table: 'example_table',
     };
-    const rpcSource = new EosRpcSourceImpl('http://example.com');
+    const rpcSource = new AntelopeRpcSourceImpl('http://example.com');
 
     await rpcSource.getTableRows(options);
 
@@ -47,7 +47,7 @@ describe('EosRpcSource', () => {
       (JsonRpc as jest.Mock).mockImplementation(() => ({
         get_info: jest.fn(),
       }));
-      const rpcSource = new EosRpcSourceImpl('http://example.com');
+      const rpcSource = new AntelopeRpcSourceImpl('http://example.com');
       const mockInfo: BlockchainInfo = {};
       jest.spyOn((rpcSource as any).rpc, 'get_info').mockResolvedValue(mockInfo);
 
@@ -66,7 +66,7 @@ describe('EosRpcSource', () => {
           head_block_num: 123456,
         })),
       }));
-      const rpcSource = new EosRpcSourceImpl('http://example.com');
+      const rpcSource = new AntelopeRpcSourceImpl('http://example.com');
       const mockInfo: BlockchainInfo = { head_block_num: 123456 };
       jest.spyOn((rpcSource as any).rpc, 'get_info').mockResolvedValue(mockInfo);
 
@@ -85,7 +85,7 @@ describe('EosRpcSource', () => {
           head_block_num: 123456,
         })),
       }));
-      const rpcSource = new EosRpcSourceImpl('http://example.com');
+      const rpcSource = new AntelopeRpcSourceImpl('http://example.com');
       const mockInfo: BlockchainInfo = { last_irreversible_block_num: 789012 };
       jest.spyOn((rpcSource as any).rpc, 'get_info').mockResolvedValue(mockInfo);
 

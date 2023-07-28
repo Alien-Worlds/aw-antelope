@@ -33,8 +33,8 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@alien-worlds/aw-core": "^0.0.2",
-    "@alien-worlds/aw-storage-mongodb": "^0.0.3",
+    "@alien-worlds/aw-core": "^0.0.3",
+    "@alien-worlds/aw-storage-mongodb": "^0.0.4",
     "eosjs": "^22.1.0"
   }
 }

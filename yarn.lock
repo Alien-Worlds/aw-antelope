@@ -2,21 +2,21 @@
 # yarn lockfile v1
 
 
-"@alien-worlds/aw-core@^0.0.3":
-  version "0.0.3"
-  resolved "https://npm.pkg.github.com/download/@alien-worlds/aw-core/0.0.3/1b5af094fced3d97824d909190d446c116aa6bec#1b5af094fced3d97824d909190d446c116aa6bec"
-  integrity sha512-5aWRA7svi9qWEZO0ROJNUNGnw/KftSPLkcekCjm5ecB0ufMo01eI68A+RlufuCbLaeTKH8K8pKWFgycSxGRBwQ==
+"@alien-worlds/aw-core@^0.0.5":
+  version "0.0.5"
+  resolved "https://npm.pkg.github.com/download/@alien-worlds/aw-core/0.0.5/0c1e8e73bba6896dbb7c9579e9561fad38ea2090#0c1e8e73bba6896dbb7c9579e9561fad38ea2090"
+  integrity sha512-DXFb6UPmo4uhcokBNBQSNb3vRlW4kUS9GwS30y2KXvtkhL+jIS8TX65/SCwUkxOTZvvpeNCIuzKRp0HRmMQ+9A==
   dependencies:
     inversify "^6.0.1"
     node-fetch "2.6.6"
     reflect-metadata "^0.1.13"
 
-"@alien-worlds/aw-storage-mongodb@^0.0.4":
-  version "0.0.4"
-  resolved "https://npm.pkg.github.com/download/@alien-worlds/aw-storage-mongodb/0.0.4/cbcc7113bfdd4bc1b625207ceacf4462f0778b14#cbcc7113bfdd4bc1b625207ceacf4462f0778b14"
-  integrity sha512-zN8u7dc/MPnlljeDq7G3Vr9J/+ViDSA9wNbH88kZj+6RsaneBKPVdxZNxh8oCofK5bQltBBFbD/yy8Ifp1MfDw==
+"@alien-worlds/aw-storage-mongodb@^0.0.5":
+  version "0.0.5"
+  resolved "https://npm.pkg.github.com/download/@alien-worlds/aw-storage-mongodb/0.0.5/9cc17479fa49dedc32e47c7b0e0fadd8ee900a15#9cc17479fa49dedc32e47c7b0e0fadd8ee900a15"
+  integrity sha512-QVqKT/TLRnhPVMuqI4H5KqICS+KUbPGxT2jvGyhBABTvRdkAgnk/bkQf5ooQEJttICrNSZQxVAvPPHrY5hRo7A==
   dependencies:
-    "@alien-worlds/aw-core" "^0.0.3"
+    "@alien-worlds/aw-core" "^0.0.5"
     mongodb "4.9.1"
 
 "@ampproject/remapping@^2.2.0":

@@ -16,10 +16,11 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Method to deserialize ABI from hexadecimal representation.
    *
+   * @async
    * @param {string} hex - The hexadecimal representation of the ABI.
-   * @returns {Abi} The deserialized ABI.
+   * @returns {Promise<AbiType>} The deserialized ABI.
    */
-  public getAbiFromHex<AbiType = Abi>(hex: string): AbiType {
+  public async getAbiFromHex<AbiType = Abi>(hex: string): Promise<AbiType> {
     try {
       const textEncoder = new TextEncoder();
       const textDecoder = new TextDecoder();
@@ -42,18 +43,18 @@ export class AntelopeSerializer implements Serializer {
 
   /**
    * Method to convert ABI to hexadecimal string.
-   *
+   * @async
    * @param {AbiType} abi - The ABI object.
-   * @returns {string} The ABI hex string.
+   * @returns {Promise<string>} The ABI hex string.
    */
-  public getHexFromAbi<AbiType = Abi>(abi: AbiType): string {
+  public async getHexFromAbi<AbiType = Abi>(abi: AbiType): Promise<string> {
     try {
       const buffer = new Serialize.SerialBuffer({
         textEncoder: new TextEncoder(),
         textDecoder: new TextDecoder(),
       });
 
-      const types = this.getTypesFromAbi(abi);
+      const types = await this.getTypesFromAbi(abi);
       const type = types.get('abi_def');
       type.serialize(buffer, abi);
       return this.uint8ArrayToHex(buffer.asUint8Array());
@@ -67,13 +68,13 @@ export class AntelopeSerializer implements Serializer {
 
   /**
    * Method to get types from provided ABI.
-   *
+   * @async
    * @param {Abi} abi
-   * @returns {Map<string, Serialize.Type>}
+   * @returns {Promise<Map<string, Serialize.Type>>}
    */
-  public getTypesFromAbi<Type = Serialize.Type, AbiType = Abi>(
+  public async getTypesFromAbi<Type = Serialize.Type, AbiType = Abi>(
     abi: AbiType
-  ): Map<string, Type> {
+  ): Promise<Map<string, Type>> {
     try {
       return Serialize.getTypesFromAbi(
         Serialize.createAbiTypes(),
@@ -90,21 +91,22 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Deserializes a block.
    *
+   * @async
    * @param {RawBlock} data - The raw block data.
    * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @param {...unknown[]} args - Additional arguments for deserialization if needed.
-   * @returns {ReturnType} The deserialized block.
+   * @returns {Promise<ReturnType>} The deserialized block.
    */
-  public deserializeBlock<ReturnType = UnknownObject>(
+  public async deserializeBlock<ReturnType = UnknownObject>(
     data: RawBlock,
     abi?: string | UnknownObject,
     ...args: unknown[]
-  ): ReturnType {
+  ): Promise<ReturnType> {
     try {
       let contractAbi: Abi;
 
       if (typeof abi === 'string') {
-        contractAbi = this.getAbiFromHex(abi);
+        contractAbi = await this.getAbiFromHex(abi);
       } else {
         contractAbi = abi as unknown as Abi;
       }
@@ -118,15 +120,15 @@ export class AntelopeSerializer implements Serializer {
       let deltas;
 
       if (data.block && data.block.length > 0) {
-        block = this.deserialize(data.block, 'signed_block', types);
+        block = await this.deserialize(data.block, 'signed_block', types);
       }
 
       if (data.traces && data.traces.length > 0) {
-        traces = this.deserialize(data.traces, 'transaction_trace[]', types);
+        traces = await this.deserialize(data.traces, 'transaction_trace[]', types);
       }
 
       if (data.deltas && data.deltas.length > 0) {
-        deltas = this.deserialize(data.deltas, 'table_delta[]', types);
+        deltas = await this.deserialize(data.deltas, 'table_delta[]', types);
       }
 
       return {
@@ -148,23 +150,24 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Deserializes the action data for a specific account and action.
    *
+   * @async
    * @param {string} contract - The contract associated with the action.
    * @param {string} action - The action name.
    * @param {Uint8Array} data - The raw data to be deserialized.
    * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
-   * @returns {Type} The deserialized action data.
+   * @returns {Promise<Type>} The deserialized action data.
    */
-  public deserializeActionData<T = UnknownObject>(
+  public async deserializeActionData<T = UnknownObject>(
     contract: string,
     action: string,
     data: Uint8Array,
     abi: string | UnknownObject,
     ...args: unknown[]
-  ): T {
+  ): Promise<T> {
     try {
       let contractAbi: Abi;
       if (typeof abi === 'string') {
-        contractAbi = this.getAbiFromHex(abi);
+        contractAbi = await this.getAbiFromHex(abi);
       } else {
         contractAbi = abi as unknown as Abi;
       }
@@ -210,22 +213,23 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Deserializes a table delta for a specific table.
    *
+   * @async
    * @param {string} table - The table name.
    * @param {Uint8Array} data - The raw data to be deserialized.
    * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
-   * @returns {Type} The deserialized table delta.
+   * @returns {Promise<Type>} The deserialized table delta.
    */
-  public deserializeTableRowData<T = UnknownObject>(
+  public async deserializeTableRowData<T = UnknownObject>(
     table: string,
     data: Uint8Array,
     abi: string | UnknownObject,
     ...args: unknown[]
-  ): T {
+  ): Promise<T> {
     try {
       let contractAbi: Abi;
 
       if (typeof abi === 'string') {
-        contractAbi = this.getAbiFromHex(abi);
+        contractAbi = await this.getAbiFromHex(abi);
       } else {
         contractAbi = abi as unknown as Abi;
       }
@@ -275,17 +279,18 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Deserializes a transaction for a specific contract.
    *
+   * @async
    * @param {string} contract - The contract associated with the transaction.
    * @param {Uint8Array} data - The raw data to be deserialized.
    * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
-   * @returns {Type} The deserialized transaction.
+   * @returns {Promise<Type>} The deserialized transaction.
    */
-  public deserializeTransaction<T = unknown>(
+  public async deserializeTransaction<T = unknown>(
     contract: string,
     data: Uint8Array,
     abi?: string | UnknownObject,
     ...args: unknown[]
-  ): T {
+  ): Promise<T> {
     try {
       const textEncoder = new TextEncoder();
       const textDecoder = new TextDecoder();
@@ -314,7 +319,7 @@ export class AntelopeSerializer implements Serializer {
         const dataBytes = sb.getBytes();
 
         const deserializedData = abi
-          ? this.deserializeActionData(contract, name, dataBytes, abi)
+          ? await this.deserializeActionData(contract, name, dataBytes, abi)
           : dataBytes;
 
         deserializedActions.push({
@@ -339,15 +344,16 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Deserializes the table.
    *
+   * @async
    * @param {Uint8Array} data - The raw data to be deserialized.
    * @param {string | UnknownObject} abi - ABI in the form of a hexadecimal string or as an object. If the ABI is not given then any internal Uint8Array will not be parsed.
    * @returns {TableRow<Type>} The deserialized table data.
    */
-  public deserializeTableRow<Type = unknown>(
+  public async deserializeTableRow<Type = unknown>(
     row: Row,
     abi?: string | UnknownObject,
     ...args: unknown[]
-  ): TableRow<Type | Uint8Array> {
+  ): Promise<TableRow<Type | Uint8Array>> {
     try {
       const { data, present } = row;
       const sb = new Serialize.SerialBuffer({
@@ -363,7 +369,7 @@ export class AntelopeSerializer implements Serializer {
       const payer = sb.getName();
       const bytes = sb.getBytes();
       const deserializedData = abi
-        ? this.deserializeTableRowData<Type>(table, bytes, abi)
+        ? await this.deserializeTableRowData<Type>(table, bytes, abi)
         : bytes;
 
       return {
@@ -388,18 +394,19 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Serializes a value to Uint8Array based on the given type.
    *
+   * @async
    * @param {unknown} value - The value to be serialized.
    * @param {string} type - The type of the value to be serialized.
    * @param {Map<string, unknown>} types - The map of available types for serialization.
    * @param {...unknown[]} args - Additional arguments for serialization if needed.
-   * @returns {Uint8Array} The serialized value as Uint8Array.
+   * @returns {Promise<Uint8Array>} The serialized value as Uint8Array.
    */
-  public serialize(
+  public async serialize(
     value: unknown,
     type?: string,
     types?: Map<string, Serialize.Type>,
     ...args: unknown[]
-  ): Uint8Array {
+  ): Promise<Uint8Array> {
     const buffer = new Serialize.SerialBuffer({
       textEncoder: new TextEncoder(),
       textDecoder: new TextDecoder(),
@@ -417,18 +424,19 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Deserializes a value from Uint8Array based on the given type.
    *
+   * @async
    * @param {Uint8Array} value - The value to be deserialized as Uint8Array.
    * @param {string} type - The type of the value to be deserialized.
    * @param {Map<string, unknown>} types - The map of available types for deserialization.
    * @param {...unknown[]} args - Additional arguments for deserialization if needed.
-   * @returns {Type} The deserialized value.
+   * @returns {Promise<Type>} The deserialized value.
    */
-  public deserialize<Type = unknown>(
+  public async deserialize<Type = unknown>(
     value: Uint8Array,
     type?: string,
     types?: Map<string, Serialize.Type>,
     ...args: unknown[]
-  ): Type {
+  ): Promise<Type> {
     try {
       const textEncoder = new TextEncoder();
       const textDecoder = new TextDecoder();
@@ -459,20 +467,22 @@ export class AntelopeSerializer implements Serializer {
   /**
    * Converts given hex string to Uint8Array.
    *
+   * @async
    * @param {string} value - The value to be serialized.
    * @returns {Uint8Array} The serialized value as Uint8Array.
    */
-  public hexToUint8Array(value: string): Uint8Array {
+  public async hexToUint8Array(value: string): Promise<Uint8Array> {
     return hexToUint8Array(value);
   }
 
   /**
    * Converts given Uint8Array to hex string.
    *
+   * @async
    * @param {Uint8Array} value - The Uint8Array value to be converted.
    * @returns {Uint8Array} The serialized value as Uint8Array.
    */
-  public uint8ArrayToHex(value: Uint8Array): string {
+  public async uint8ArrayToHex(value: Uint8Array): Promise<string> {
     return arrayToHex(value);
   }
 }

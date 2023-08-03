@@ -71,7 +71,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
         await this.shipAbis.updateAbi(abi.version, abi);
       }
 
-      this._abiTypes = this.serializer.getTypesFromAbi(abi);
+      this._abiTypes = await this.serializer.getTypesFromAbi(abi);
       this._abi = abi;
 
       if (_blockRangeRequest) {
@@ -108,7 +108,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * @param {Uint8Array} dto - The Uint8Array message received from the BlockReaderSource.
    * @returns {Promise<void>} A promise that resolves once the message is handled.
    */
-  public onMessage(dto: Uint8Array): Promise<void> {
+  public async onMessage(dto: Uint8Array): Promise<void> {
     const { abi } = this;
 
     if (!abi) {
@@ -116,7 +116,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
       return;
     }
 
-    const result = this.serializer.deserialize(dto, 'result', this._abiTypes);
+    const result = await this.serializer.deserialize(dto, 'result', this._abiTypes);
     const message = BlockReaderMessage.create(result, abi as DefaultAbi);
     if (message && message.isPongMessage === false) {
       this.handleBlocksResultContent(message.content);
@@ -164,7 +164,8 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
           if (this.source.isConnected && this._paused === false) {
             // Acknowledge a request so that source can send next one.
             const { type, value } = new GetBlocksAckRequest(1).toJSON();
-            this.source.send(this.serializer.serialize(value, type, _abiTypes));
+            const buffer = await this.serializer.serialize(value, type, _abiTypes);
+            this.source.send(buffer);
           }
         }
       } else {
@@ -237,8 +238,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
   public resume(): void {
     if (this._paused && !this.isLastBlock) {
       this._paused = false;
-      const { type, value } = new GetBlocksAckRequest(1).toJSON();
-      this.source.send(this.serializer.serialize(value, type, this._abiTypes));
+      this.sendGetBlocksAckRequest();
     }
   }
 
@@ -267,6 +267,12 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
     log(`BlockReader plugin: read single block ${block}`);
   }
 
+  private async sendGetBlocksAckRequest() {
+    const { type, value } = new GetBlocksAckRequest(1).toJSON();
+    const buffer = await this.serializer.serialize(value, type, this._abiTypes);
+    this.source.send(buffer);
+  }
+
   /**
    * Private method to send a request for block retrieval to the BlockReaderSource.
    * @private
@@ -274,18 +280,22 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * @param {bigint} endBlock - The ending block number (exclusive).
    * @param {BlockReaderOptions} [options] - Additional options for block retrieval.
    */
-  private sendRequest(
+  private async sendRequest(
     startBlock: bigint,
     endBlock: bigint,
     options?: BlockReaderOptions
-  ): void {
+  ): Promise<void> {
     const requestOptions = options || {
       shouldFetchDeltas: true,
       shouldFetchTraces: true,
     };
 
     this.isLastBlock = false;
-    this.resume();
+    // is paused
+    if (this._paused) {
+      this._paused = false;
+      await this.sendGetBlocksAckRequest();
+    }
 
     const { abi, receivedBlockHandler, source } = this;
     if (!receivedBlockHandler) {
@@ -302,6 +312,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
       requestOptions
     );
     const { type, value } = this._blockRangeRequest.toJSON();
-    source.send(this.serializer.serialize(value, type, this._abiTypes));
+    const buffer = await this.serializer.serialize(value, type, this._abiTypes);
+    source.send(buffer);
   }
 }

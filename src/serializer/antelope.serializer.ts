@@ -5,14 +5,14 @@ import { Row, Serializer, TableRow, UnknownObject, log } from '@alien-worlds/aw-
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { RawBlock } from './antelope.serializer.types';
 import { Serialize } from 'eosjs';
-import { hexToUint8Array } from 'eosjs/dist/eosjs-serialize';
 import { ShipAbiRepository } from '../block-reader';
+import { hexToUint8Array } from 'eosjs/dist/eosjs-serialize';
 
 /**
  * Serializer implementation for Antelope.
  */
 export class AntelopeSerializer implements Serializer {
-  constructor(protected shipAbis: ShipAbiRepository, protected logErrors = true) {}
+  constructor(protected shipAbis: ShipAbiRepository, protected logErrors = true) { }
 
   /**
    * Method to deserialize ABI from hexadecimal representation.
@@ -382,7 +382,12 @@ export class AntelopeSerializer implements Serializer {
       const table = sb.getName();
       const primaryKey = Buffer.from(sb.getUint8Array(8)).readBigInt64BE();
       const payer = sb.getName();
-      const bytes = sb.getBytes();
+
+      let bytes;
+      if (sb.haveReadData()) {
+        bytes = sb.getBytes();
+      }
+
       const deserializedData = abi
         ? await this.deserializeTableRowData<Type>(table, bytes, abi)
         : bytes;

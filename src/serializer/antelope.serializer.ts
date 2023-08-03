@@ -6,12 +6,13 @@ import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { RawBlock } from './antelope.serializer.types';
 import { Serialize } from 'eosjs';
 import { hexToUint8Array } from 'eosjs/dist/eosjs-serialize';
+import { ShipAbiRepository } from '../block-reader';
 
 /**
  * Serializer implementation for Antelope.
  */
 export class AntelopeSerializer implements Serializer {
-  constructor(protected logErrors = true) {}
+  constructor(protected shipAbis: ShipAbiRepository, protected logErrors = true) {}
 
   /**
    * Method to deserialize ABI from hexadecimal representation.
@@ -103,9 +104,23 @@ export class AntelopeSerializer implements Serializer {
     ...args: unknown[]
   ): Promise<ReturnType> {
     try {
-      let contractAbi: Abi;
+      let contractAbi;
 
-      if (typeof abi === 'string') {
+      if (!abi) {
+        const { content, failure } = await this.shipAbis.getAbi(data.abi_version);
+
+        if (failure) {
+          if (this.logErrors) {
+            log(
+              `Unable to get SHiP ABI for version "${data.abi_version}". ${failure.error}`
+            );
+          }
+          return null;
+        }
+
+        contractAbi = content;
+
+      } else if (typeof abi === 'string') {
         contractAbi = await this.getAbiFromHex(abi);
       } else {
         contractAbi = abi as unknown as Abi;
@@ -140,7 +155,7 @@ export class AntelopeSerializer implements Serializer {
     } catch (error) {
       if (this.logErrors) {
         log(
-          `Unable to deserialize block, most likely data cannot be deserialized using eosjs.Serialize. ${error.message}`
+          `Unable to deserialize block, most likely data cannot be deserialized using eosjs.Serialize or mising ABI. ${error}`
         );
       }
       return null;

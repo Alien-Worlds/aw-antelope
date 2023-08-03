@@ -32,7 +32,11 @@ export class AntelopeBlockReaderFactory {
       new MongoQueryBuilders()
     );
     const source = new AntelopeBlockReaderSource(config);
-    const reader = new AntelopeBlockReader(source, repository, new AntelopeSerializer());
+    const reader = new AntelopeBlockReader(
+      source,
+      repository,
+      new AntelopeSerializer(repository)
+    );
 
     log(` *  Block Reader ... [ready]`);
     return reader;

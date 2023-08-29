@@ -29,6 +29,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
   private _abiTypes: Map<string, unknown>;
   private _paused = false;
   private isLastBlock = false;
+  private autoReconnect: boolean;
   /**
    * Creates an instance of BlockReader.
    * @param {AntelopeBlockReaderSource} source - The BlockReaderSource instance for handling the WebSocket connection.
@@ -38,18 +39,21 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
   constructor(
     private source: AntelopeBlockReaderSource,
     private shipAbis: ShipAbiRepository,
-    private serializer: Serializer
+    private serializer: Serializer,
+    options?: { autoReconnect?: boolean }
   ) {
     super();
+
+    this.autoReconnect = options?.autoReconnect || true;
     this.source.onMessage(message => this.onMessage(message));
     this.source.onError(error => {
       this.handleError(error);
     });
     this.source.addConnectionStateHandler(BlockReaderConnectionState.Connected, options =>
-      this.onConnected(options)
+      this.onConnectedSource(options)
     );
     this.source.addConnectionStateHandler(BlockReaderConnectionState.Idle, options =>
-      this.onDisconnected(options)
+      this.onDisconnectedSource(options)
     );
   }
 
@@ -59,10 +63,8 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * @param {ConnectionChangeHandlerOptions} options - The options containing data related to the connection change.
    * @returns {Promise<void>} A promise that resolves once the handling is complete.
    */
-  private async onConnected({ data }: ConnectionChangeHandlerOptions) {
+  private async onConnectedSource({ data }: ConnectionChangeHandlerOptions) {
     log(`BlockReader plugin connected`);
-    const { _blockRangeRequest } = this;
-
     const abi = JSON.parse(data);
     if (abi) {
       const result = await this.shipAbis.getAbi(abi.version);
@@ -74,11 +76,8 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
       this._abiTypes = await this.serializer.getTypesFromAbi(abi);
       this._abi = abi;
 
-      if (_blockRangeRequest) {
-        // resume previously unfinished request
-        const { startBlock, endBlock, shouldFetchDeltas, shouldFetchTraces } =
-          _blockRangeRequest;
-        this.sendRequest(startBlock, endBlock, { shouldFetchDeltas, shouldFetchTraces });
+      if (this.connectedCallback) {
+        await this.connectedCallback();
       }
     }
   }
@@ -88,40 +87,18 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * @private
    * @param {ConnectionChangeHandlerOptions} options - The options containing data related to the connection change.
    */
-  private onDisconnected({ previousState }: ConnectionChangeHandlerOptions) {
+  private async onDisconnectedSource({ previousState }: ConnectionChangeHandlerOptions) {
     log(`BlockReader plugin disconnected`);
     if (previousState === BlockReaderConnectionState.Disconnecting) {
       this._abi = null;
     }
-    this.connect();
-  }
 
-  /**
-   * Returns the ABI associated with the BlockReader.
-   */
-  public get abi(): Abi {
-    return this._abi;
-  }
-
-  /**
-   * Registers a message handler to handle incoming messages from the BlockReaderSource.
-   * @param {Uint8Array} dto - The Uint8Array message received from the BlockReaderSource.
-   * @returns {Promise<void>} A promise that resolves once the message is handled.
-   */
-  public async onMessage(dto: Uint8Array): Promise<void> {
-    const { abi } = this;
-
-    if (!abi) {
-      this.handleError(new ShipAbiNotFoundError());
-      return;
+    if (this.disconnectedCallback) {
+      await this.disconnectedCallback();
     }
 
-    const result = await this.serializer.deserialize(dto, 'result', this._abiTypes);
-    const message = BlockReaderMessage.create(result, abi as DefaultAbi);
-    if (message && message.isPongMessage === false) {
-      this.handleBlocksResultContent(message.content);
-    } else if (!message) {
-      this.handleError(new UnhandledMessageTypeError(message.type));
+    if (this.autoReconnect) {
+      this.connect();
     }
   }
 
@@ -199,6 +176,55 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
     }
   }
 
+  private async sendGetBlocksAckRequest() {
+    const { type, value } = new GetBlocksAckRequest(1).toJSON();
+    const buffer = await this.serializer.serialize(value, type, this._abiTypes);
+    this.source.send(buffer);
+  }
+
+  /**
+   * Private method to send a request for block retrieval to the BlockReaderSource.
+   * @private
+   * @param {bigint} startBlock - The starting block number.
+   * @param {bigint} endBlock - The ending block number (exclusive).
+   * @param {BlockReaderOptions} [options] - Additional options for block retrieval.
+   */
+  private async sendRequest(
+    startBlock: bigint,
+    endBlock: bigint,
+    options?: BlockReaderOptions
+  ): Promise<void> {
+    const requestOptions = options || {
+      shouldFetchDeltas: true,
+      shouldFetchTraces: true,
+    };
+
+    this.isLastBlock = false;
+    // is paused
+    if (this._paused) {
+      this._paused = false;
+      await this.sendGetBlocksAckRequest();
+    }
+
+    const { abi, receivedBlockHandler, source } = this;
+    if (!receivedBlockHandler) {
+      throw new MissingHandlersError();
+    }
+
+    if (!abi) {
+      throw new ShipAbiNotFoundError();
+    }
+
+    this._blockRangeRequest = GetBlocksRequest.create(
+      startBlock,
+      endBlock,
+      requestOptions
+    );
+    const { type, value } = this._blockRangeRequest.toJSON();
+    const buffer = await this.serializer.serialize(value, type, this._abiTypes);
+    source.send(buffer);
+  }
+
   /**
    * Establishes a connection to the block reader service.
    * @returns {Promise<void>} A promise that resolves once the connection is established.
@@ -208,6 +234,36 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
       await this.source.connect();
     } else {
       log(`Service already connected`);
+    }
+  }
+
+  /**
+   * Returns the ABI associated with the BlockReader.
+   */
+  public get abi(): Abi {
+    return this._abi;
+  }
+
+  /**
+   * Registers a message handler to handle incoming messages from the BlockReaderSource.
+   * @param {Uint8Array} dto - The Uint8Array message received from the BlockReaderSource.
+   * @returns {Promise<void>} A promise that resolves once the message is handled.
+   */
+  public async onMessage(dto: Uint8Array): Promise<void> {
+    const { abi } = this;
+
+    if (!abi) {
+      this.handleError(new ShipAbiNotFoundError());
+      return;
+    }
+
+    const result = await this.serializer.deserialize(dto, 'result', this._abiTypes);
+    const message = BlockReaderMessage.create(result, abi as DefaultAbi);
+
+    if (message && message.isPongMessage === false) {
+      this.handleBlocksResultContent(message.content);
+    } else if (!message) {
+      this.handleError(new UnhandledMessageTypeError(message.type));
     }
   }
 
@@ -265,54 +321,5 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
   public readOneBlock(block: bigint, options?: BlockReaderOptions): void {
     this.sendRequest(block, block + 1n, options);
     log(`BlockReader plugin: read single block ${block}`);
-  }
-
-  private async sendGetBlocksAckRequest() {
-    const { type, value } = new GetBlocksAckRequest(1).toJSON();
-    const buffer = await this.serializer.serialize(value, type, this._abiTypes);
-    this.source.send(buffer);
-  }
-
-  /**
-   * Private method to send a request for block retrieval to the BlockReaderSource.
-   * @private
-   * @param {bigint} startBlock - The starting block number.
-   * @param {bigint} endBlock - The ending block number (exclusive).
-   * @param {BlockReaderOptions} [options] - Additional options for block retrieval.
-   */
-  private async sendRequest(
-    startBlock: bigint,
-    endBlock: bigint,
-    options?: BlockReaderOptions
-  ): Promise<void> {
-    const requestOptions = options || {
-      shouldFetchDeltas: true,
-      shouldFetchTraces: true,
-    };
-
-    this.isLastBlock = false;
-    // is paused
-    if (this._paused) {
-      this._paused = false;
-      await this.sendGetBlocksAckRequest();
-    }
-
-    const { abi, receivedBlockHandler, source } = this;
-    if (!receivedBlockHandler) {
-      throw new MissingHandlersError();
-    }
-
-    if (!abi) {
-      throw new ShipAbiNotFoundError();
-    }
-
-    this._blockRangeRequest = GetBlocksRequest.create(
-      startBlock,
-      endBlock,
-      requestOptions
-    );
-    const { type, value } = this._blockRangeRequest.toJSON();
-    const buffer = await this.serializer.serialize(value, type, this._abiTypes);
-    source.send(buffer);
   }
 }

@@ -322,4 +322,22 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
     this.sendRequest(block, block + 1n, options);
     log(`BlockReader plugin: read single block ${block}`);
   }
+
+  /**
+   * Checks if currently connected.
+   *
+   * @returns {boolean} - True if connected, otherwise false.
+   */
+  public isConnected(): boolean {
+    return this.source.isConnected;
+  }
+
+  /**
+   * Checks if currently paused.
+   *
+   * @returns {boolean} - True if paused, otherwise false.
+   */
+  public isPaused(): boolean {
+    return this._paused;
+  }
 }

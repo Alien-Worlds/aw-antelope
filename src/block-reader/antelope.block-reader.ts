@@ -27,7 +27,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
   private _blockRangeRequest: GetBlocksRequest;
   private _abi: Abi;
   private _abiTypes: Map<string, unknown>;
-  private _paused = false;
+  private _isPaused = false;
   private isLastBlock = false;
   private autoReconnect: boolean;
   /**
@@ -138,7 +138,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
           // processing the full range, it will send messages containing only head.
           // After the block has been processed, the connection should be closed so
           // there is no need to ack request.
-          if (this.source.isConnected && this._paused === false) {
+          if (this.source.isConnected && this._isPaused === false) {
             // Acknowledge a request so that source can send next one.
             const { type, value } = new GetBlocksAckRequest(1).toJSON();
             const buffer = await this.serializer.serialize(value, type, _abiTypes);
@@ -199,10 +199,17 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
       shouldFetchTraces: true,
     };
 
+    if (this.source.isConnected === false) {
+      log(
+        `BlockReader plugin: Cannot send the request because the block reader is not connected.`
+      );
+      return;
+    }
+
     this.isLastBlock = false;
     // is paused
-    if (this._paused) {
-      this._paused = false;
+    if (this._isPaused) {
+      this._isPaused = false;
       await this.sendGetBlocksAckRequest();
     }
 
@@ -233,7 +240,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
     if (this.source.isConnected === false) {
       await this.source.connect();
     } else {
-      log(`Service already connected`);
+      log(`BlockReader plugin: already connected`);
     }
   }
 
@@ -275,7 +282,7 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
     if (this.source.isConnected) {
       await this.source.disconnect();
     } else {
-      log(`Service not connected`);
+      log(`BlockReader plugin: not connected`);
     }
   }
 
@@ -283,8 +290,12 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * Pauses block retrieval. The BlockReader will stop sending requests for blocks.
    */
   public pause(): void {
-    if (this._paused === false) {
-      this._paused = true;
+    if (this.source.isConnected) {
+      if (this._isPaused === false) {
+        this._isPaused = true;
+      }
+    } else {
+      log(`BlockReader plugin: Cannot pause because the block reader is not connected.`);
     }
   }
 
@@ -292,9 +303,13 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * Resumes block retrieval. The BlockReader will continue sending requests for blocks.
    */
   public resume(): void {
-    if (this._paused && !this.isLastBlock) {
-      this._paused = false;
-      this.sendGetBlocksAckRequest();
+    if (this.source.isConnected) {
+      if (this._isPaused && !this.isLastBlock) {
+        this._isPaused = false;
+        this.sendGetBlocksAckRequest();
+      }
+    } else {
+      log(`BlockReader plugin: Cannot resume because the block reader is not connected.`);
     }
   }
 
@@ -338,6 +353,6 @@ export class AntelopeBlockReader<Abi = UnknownObject> extends BlockReader {
    * @returns {boolean} - True if paused, otherwise false.
    */
   public isPaused(): boolean {
-    return this._paused;
+    return this._isPaused;
   }
 }

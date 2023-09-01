@@ -11,10 +11,10 @@
     node-fetch "2.6.6"
     reflect-metadata "^0.1.13"
 
-"@alien-worlds/aw-storage-mongodb@^0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@alien-worlds/aw-storage-mongodb/-/aw-storage-mongodb-0.0.15.tgz#b63514eebaab0a525637a5dfa151e7e35f7bdce6"
-  integrity sha512-SZ/xYdhQxrFXaZjcmOgv2VIwASMiZWP+9MV3dwP4gd/tD9AtjsWlDYY6Ui2mDL2hHWwbOcLt1DEpYQXf1+h56g==
+"@alien-worlds/aw-storage-mongodb@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@alien-worlds/aw-storage-mongodb/-/aw-storage-mongodb-0.0.16.tgz#5475a041b02517796348256b688319f46ac887cf"
+  integrity sha512-l0eqrtdb9OclW6Y7jSetf2FyfcrPs8deLDHL0AA4vfkfp5CfUlErJXxSoWabLvjjwohcNbQAu6dmw2yQyGrXAw==
   dependencies:
     "@alien-worlds/aw-core" "^0.0.21"
     mongodb "4.9.1"

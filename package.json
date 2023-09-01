@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@alien-worlds/aw-core": "^0.0.21",
-    "@alien-worlds/aw-storage-mongodb": "^0.0.15",
+    "@alien-worlds/aw-storage-mongodb": "^0.0.16",
     "eosjs": "^22.1.0"
   }
 }

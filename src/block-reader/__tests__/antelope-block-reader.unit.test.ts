@@ -47,13 +47,13 @@ describe('BlockReader', () => {
     });
 
     it('should set the ABI if it exists in the ShipAbiRepository', async () => {
-      await (blockReader as any).onConnected({ data: JSON.stringify(mockAbiData) });
+      await (blockReader as any).onConnectedSource({ data: JSON.stringify(mockAbiData) });
       expect((blockReader as any).abi).toEqual(mockAbiData);
     });
 
     it('should update the ABI in the ShipAbiRepository if it does not exist', async () => {
       jest.spyOn(mockShipAbis, 'updateAbi').mockReturnValue(Promise.resolve({} as any));
-      await (blockReader as any).onConnected({ data: JSON.stringify(mockAbiData) });
+      await (blockReader as any).onConnectedSource({ data: JSON.stringify(mockAbiData) });
       expect(mockShipAbis.updateAbi).toHaveBeenCalledWith('1.0', mockAbiData);
       expect((blockReader as any).abi).toEqual(mockAbiData);
     });
@@ -66,7 +66,7 @@ describe('BlockReader', () => {
 
     it('should log a message when the BlockReaderSource is disconnected', () => {
       const consoleLogSpy = jest.spyOn(console, 'log');
-      (blockReader as any).onDisconnected({
+      (blockReader as any).onDisconnectedSource({
         previousState: BlockReaderConnectionState.Disconnecting,
       });
       expect(consoleLogSpy).toHaveBeenCalled();
@@ -74,14 +74,14 @@ describe('BlockReader', () => {
 
     it('should clear the ABI when the previous state is Disconnecting', () => {
       (blockReader as any)._abi = { version: '1.0', typesMap: {} };
-      (blockReader as any).onDisconnected({
+      (blockReader as any).onDisconnectedSource({
         previousState: BlockReaderConnectionState.Disconnecting,
       });
       expect((blockReader as any).abi).toBeNull();
     });
 
     it('should call the connect method when the previous state is Idle', () => {
-      (blockReader as any).onDisconnected({
+      (blockReader as any).onDisconnectedSource({
         previousState: BlockReaderConnectionState.Idle,
       });
       expect(blockReader.connect).toHaveBeenCalled();
